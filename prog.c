@@ -120,20 +120,20 @@ double **init_F(int M, int N, double h1, double h2, double eps) {
 
 int main() {
   // запуск тестов
-  //if (0) {
-  //  test_calc_l_ij();
-  //  test_calc_p_ij();
-  //  test_calc_S_ij();
-  //}
+  if (1) {
+    test_calc_l_ij();
+    test_calc_p_ij();
+    test_calc_S_ij();
+  }
   double start, end;
   start = omp_get_wtime();
 
   const double A1 = -4.0, B1 = 4.0, A2 = -1.0, B2 = 3.0;
-  const int N = 20, M = 20;
+  const int N = 100, M = 100;
   const double h1 = (B1 - A1) / (1.0 * M);
   const double h2 = (B2 - A2) / (1.0 * N);
   const int count_iter = 100;
-  const double delta = 0.000001;
+  const double delta = 0.00001;
   const double eps = max(h1, h2) * max(h1, h2);
 
   double **a, **b, **F;
@@ -169,18 +169,18 @@ int main() {
     D_fun(a, b, r_k_0, M, N, h1, h2, z_k_0);
 
     //p_k_1 = z_k_0;
-    mat_copy(z_k_0, p_k_1, M+1, N+1);
+    mat_copy(z_k_0, M+1, N+1, p_k_1);
 
     A_fun(a, b, p_k_1, M, N, h1, h2, temp3);
     alpha_k = scalar_product(z_k_0, r_k_0, h1, h2, M, N) /
                    scalar_product(temp3, p_k_1, h1, h2, M, N);
     printf("alpha: %f\n", alpha_k);
     
-    mat_copy(p_k_1, temp4, M+1, N+1);
+    mat_copy(p_k_1, M+1, N+1, temp4);
     mat_mul_number(temp4, alpha_k, M, N);
     
     mat_plus(w_k, temp4, M + 1, N + 1, w_k_plus1);
-    mat_copy(w_k_plus1, w_k, M + 1, N + 1);
+    mat_copy(w_k_plus1, M + 1, N + 1, w_k);
   }
   printf("Start iteration\n\n");
 
@@ -209,23 +209,23 @@ int main() {
                    scalar_product(temp2, p_k_2, h1, h2, M, N);
     //printf("alpha: %f\n", alpha_k);
     
-    mat_copy(p_k_2, temp3, M+1, N+1);
+    mat_copy(p_k_2, M+1, N+1, temp3);
     mat_mul_number(temp3, alpha_k, M, N);
     
     mat_plus(w_k, temp3, M + 1, N + 1, w_k_plus1);
 
     {
-      mat_copy(w_k, temp1, M+1, N+1);
-      mat_copy(w_k_plus1, temp2, M+1, N+1);
+      mat_copy(w_k, M+1, N+1, temp1);
+      mat_copy(w_k_plus1, M+1, N+1, temp2);
       mat_minus(temp2, temp1, M+1, N+1, temp3);
       double err = norm(temp3, h1, h2, M+1, N+1);
       printf("error: %f\n", err);
     }
 
-    mat_copy(w_k_plus1, w_k, M + 1, N + 1);
-    mat_copy(z_k_1, z_k_0, M + 1, N + 1);
-    mat_copy(p_k_2, p_k_1, M + 1, N + 1);
-    mat_copy(r_k_1, r_k_0, M + 1, N + 1);
+    mat_copy(w_k_plus1, M + 1, N + 1, w_k);
+    mat_copy(z_k_1, M + 1, N + 1, z_k_0);
+    mat_copy(p_k_2, M + 1, N + 1, p_k_1);
+    mat_copy(r_k_1, M + 1, N + 1, r_k_0);
   }
 
   printf("\n");

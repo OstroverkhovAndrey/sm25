@@ -22,7 +22,7 @@ double norm(double **u, double h1, double h2, int M, int N) {
 }
 
 // копирование матрицы
-void mat_copy(double **src, double **target, int M, int N) {
+void mat_copy(double **src, int M, int N, double **target) {
   for (int j = 0; j < N; ++j) {
     for (int i = 0; i < M; ++i) {
       target[j][i] = src[j][i];
