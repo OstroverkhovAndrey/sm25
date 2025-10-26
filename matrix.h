@@ -1,8 +1,7 @@
 
 #include <args.h>
 
-double scalar_product(double *u, double *v, double h1, double h2, int M,
-                      int N);
+double scalar_product(double *u, double *v, double h1, double h2, int M, int N);
 
 double norm(double *u, double h1, double h2, int M, int N);
 

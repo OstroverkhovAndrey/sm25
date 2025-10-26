@@ -7,7 +7,6 @@ struct Point {
   double y;
 } typedef Point;
 
-
 double calc_l_ij(Point P1, Point P2);
 
 double calc_p_ij(Point P1, Point P2);
