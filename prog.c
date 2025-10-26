@@ -10,43 +10,43 @@
 #include <args.h>
 
 // оператор A
-void A_fun(double **a, double **b, double **w, int M, int N, double h1,
-           double h2, double **ans) {
+void A_fun(double *a, double *b, double *w, int M, int N, double h1,
+           double h2, double *ans) {
   int i, j;
   for (int k = 0; k < (N-1)*(M-1); ++k) {
     i = (k % (M-1)) + 1;
     j = (k / (M-1)) + 1;
-      double s1 = ((a[j][i + 1] * (w[j][i + 1] - w[j][i]) / h1) -
-                   (a[j][i] * (w[j][i] - w[j][i - 1]) / h1)) /
+      double s1 = ((a[j*(M+1)+(i + 1)] * (w[j*(M+1)+(i + 1)] - w[j*(M+1)+i]) / h1) -
+                   (a[j*(M+1)+i] * (w[j*(M+1)+i] - w[j*(M+1)+(i - 1)]) / h1)) /
                   h1;
-      double s2 = ((b[j + 1][i] * (w[j + 1][i] - w[j][i]) / h2) -
-                   (b[j][i] * (w[j][i] - w[j - 1][i]) / h2)) /
+      double s2 = ((b[(j + 1)*(M+1)+i] * (w[(j + 1)*(M+1)+i] - w[j*(M+1)+i]) / h2) -
+                   (b[j*(M+1)+i] * (w[j*(M+1)+i] - w[(j - 1)*(M+1)+i]) / h2)) /
                   h2;
-      ans[j][i] = -s1 - s2;
+      ans[j*(M+1)+i] = -s1 - s2;
     }
   return;
 }
 
 // оператор B
-void B_fun(double **F, int M, int N, double **ans) {
+void B_fun(double *F, int M, int N, double *ans) {
   int i, j;
   for (int k = 0; k < (N-1)*(M-1); ++k) {
     i = (k % (M-1)) + 1;
     j = (k / (M-1)) + 1;
-      ans[j][i] = F[j][i];
+      ans[j*(M+1)+i] = F[j*(M+1)+i];
   }
   return;
 }
 
 // оператор D
-void D_fun(double **a, double **b, double **w, int M, int N, double h1,
-           double h2, double **ans) {
+void D_fun(double *a, double *b, double *w, int M, int N, double h1,
+           double h2, double *ans) {
   int i, j;
   for (int k = 0; k < (N-1)*(M-1); ++k) {
     i = (k % (M-1)) + 1;
     j = (k / (M-1)) + 1;
-      double d = ( (a[j][i+1]+a[j][i]) / (h1*h1) ) + ( (b[j+1][i]+b[j][i]) / (h2*h2) );
-      ans[j][i] = w[j][i] / d;
+      double d = ( (a[j*(M+1)+(i+1)]+a[j*(M+1)+i]) / (h1*h1) ) + ( (b[(j+1)*(M+1)+i]+b[j*(M+1)+i]) / (h2*h2) );
+      ans[j*(M+1)+i] = w[j*(M+1)+i] / d;
   }
   return;
 }
@@ -73,8 +73,8 @@ double calc_F_ij(double h1, double h2, Point p) {
 }
 
 // инициализируем и заполняем матрицу a
-double **init_a(int M, int N, double h1, double h2, double eps) {
-  double **a = mat_create(M + 1, N + 1);
+double *init_a(int M, int N, double h1, double h2, double eps) {
+  double *a = mat_create(M + 1, N + 1);
   int i, j;
   for (int k = 0; k < N*M; ++k) {
     i = (k % M) + 1;
@@ -83,14 +83,14 @@ double **init_a(int M, int N, double h1, double h2, double eps) {
       p1.x = i * h1 - 0.5 * h1 -4, p1.y = j * h2 - 0.5 * h2 -1;
       Point p2;
       p2.x = i * h1 - 0.5 * h1 -4, p2.y = j * h2 + 0.5 * h2 -1;
-      a[j][i] = calc_a_ij(h2, p1, p2, eps);
+      a[j*(M+1)+i] = calc_a_ij(h2, p1, p2, eps);
   }
   return a;
 }
 
 // инициализируем и заполняем матрицу b
-double **init_b(int M, int N, double h1, double h2, double eps) {
-  double **b = mat_create(M + 1, N + 1);
+double *init_b(int M, int N, double h1, double h2, double eps) {
+  double *b = mat_create(M + 1, N + 1);
   int i, j;
   for (int k = 0; k < N*M; ++k) {
     i = (k % M) + 1;
@@ -99,21 +99,21 @@ double **init_b(int M, int N, double h1, double h2, double eps) {
       p1.x = i * h1 - 0.5 * h1 -4, p1.y = j * h2 - 0.5 * h2 -1;
       Point p2;
       p2.x = i * h1 + 0.5 * h1 -4, p2.y = j * h2 - 0.5 * h2 -1;
-      b[j][i] = calc_b_ij(h1, p1, p2, eps);
+      b[j*(M+1)+i] = calc_b_ij(h1, p1, p2, eps);
   }
   return b;
 }
 
 // инициализируем и заполняем матрицу F
-double **init_F(int M, int N, double h1, double h2, double eps) {
-  double **F = mat_create(M, N);
+double *init_F(int M, int N, double h1, double h2, double eps) {
+  double *F = mat_create(M+1, N+1);
   int i, j;
-  for (int k = 0; k < (N-1)*(M-1); ++k) {
-    i = (k % (M-1)) + 1;
-    j = (k / (M-1)) + 1;
+  for (int k = 0; k < N*M; ++k) {
+    i = (k % M) + 1;
+    j = (k / M) + 1;
       Point p;
       p.x = i * h1 -4, p.y = j * h2 -1;
-      F[j][i] = calc_F_ij(h1, h2, p);
+      F[j*(M+1)+i] = calc_F_ij(h1, h2, p);
   }
   return F;
 }
@@ -150,32 +150,32 @@ int main(int argc, char *argv[]) {
 
   double alpha_k;
 
-  double **a, **b, **F;
+  double *a, *b, *F;
   a = init_a(args.M, args.N, h1, h2, eps);
   b = init_b(args.M, args.N, h1, h2, eps);
   F = init_F(args.M, args.N, h1, h2, eps);
 
-  double **w_k = mat_create(M + 1, N + 1);
-  double **w_k_plus1 = mat_create(M + 1, N + 1);
+  double *w_k = mat_create(M + 1, N + 1);
+  double *w_k_plus1 = mat_create(M + 1, N + 1);
 
-  double **temp1 = mat_create(M+1, N+1);
-  double **temp2 = mat_create(M+1, N+1);
-  double **temp3 = mat_create(M+1, N+1);
-  double **temp4 = mat_create(M+1, N+1);
+  double *temp1 = mat_create(M+1, N+1);
+  double *temp2 = mat_create(M+1, N+1);
+  double *temp3 = mat_create(M+1, N+1);
+  double *temp4 = mat_create(M+1, N+1);
 
-  double **z_k_0 = mat_create(M + 1, N + 1);
-  double **p_k_1 = mat_create(M + 1, N + 1);
-  double **r_k_0 = mat_create(M + 1, N + 1);
-  double **z_k_1 = mat_create(M + 1, N + 1);
-  double **p_k_2 = mat_create(M + 1, N + 1);
-  double **r_k_1 = mat_create(M + 1, N + 1);
+  double *z_k_0 = mat_create(M + 1, N + 1);
+  double *p_k_1 = mat_create(M + 1, N + 1);
+  double *r_k_0 = mat_create(M + 1, N + 1);
+  double *z_k_1 = mat_create(M + 1, N + 1);
+  double *p_k_2 = mat_create(M + 1, N + 1);
+  double *r_k_1 = mat_create(M + 1, N + 1);
 
   {
     printf("Zero iteration\n\n");
     // r_k_0 = B - A w_k
     A_fun(a, b, w_k, M, N, h1, h2, temp1);
     B_fun(F, M, N, temp2);
-    mat_minus(temp2, temp1, M, N, r_k_0);
+    mat_minus(temp2, temp1, M+1, N+1, r_k_0);
 
     // z_k = r_k / D;
     D_fun(a, b, r_k_0, M, N, h1, h2, z_k_0);
@@ -185,13 +185,13 @@ int main(int argc, char *argv[]) {
 
     // alpha_k == (z_0, k_0) / (Ap_1, p_1)
     A_fun(a, b, p_k_1, M, N, h1, h2, temp3);
-    alpha_k = scalar_product(z_k_0, r_k_0, h1, h2, M, N) /
-                   scalar_product(temp3, p_k_1, h1, h2, M, N);
+    alpha_k = scalar_product(z_k_0, r_k_0, h1, h2, M+1, N+1) /
+                   scalar_product(temp3, p_k_1, h1, h2, M+1, N+1);
     
     // w_1 == w_0 + alpha_k * p_1
     mat_copy(p_k_1, M+1, N+1, temp4);
-    mat_mul_number(temp4, alpha_k, M, N);
-    mat_plus(w_k, temp4, M, N, w_k_plus1);
+    mat_mul_number(temp4, alpha_k, M+1, N+1);
+    mat_plus(w_k, temp4, M+1, N+1, w_k_plus1);
 
     // w_0 = w_1, для зацикливания
     mat_copy(w_k_plus1, M + 1, N + 1, w_k);
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
     // r_k_1 == r_k_0 - alpha_k A p_k_1
     A_fun(a, b, p_k_1, M, N, h1, h2, temp1);
     mat_mul_number(temp1, alpha_k, M+1, N+1);
-    mat_minus(r_k_0, temp1, M, N, r_k_1);
+    mat_minus(r_k_0, temp1, M+1, N+1, r_k_1);
 
     // z_k = r_k / D;
     D_fun(a, b, r_k_1, M, N, h1, h2, z_k_1);
@@ -216,23 +216,23 @@ int main(int argc, char *argv[]) {
 
     //p_k_2 = z_k + betta_k * p_k_1; // тут меняется p_k_1 но он больше не используется
     mat_mul_number(p_k_1, betta, M+1, N+1);
-    mat_plus(z_k_1, p_k_1, M, N, p_k_2);
+    mat_plus(z_k_1, p_k_1, M+1, N+1, p_k_2);
 
 
     // alpha_k == (z_0, k_0) / (Ap_1, p_1)
     A_fun(a, b, p_k_2, M, N, h1, h2, temp2);
-    alpha_k = scalar_product(z_k_1, r_k_1, h1, h2, M, N) /
-                   scalar_product(temp2, p_k_2, h1, h2, M, N);
+    alpha_k = scalar_product(z_k_1, r_k_1, h1, h2, M+1, N+1) /
+                   scalar_product(temp2, p_k_2, h1, h2, M+1, N+1);
     
     // w_1 == w_0 + alpha_k * p_k_2
     mat_copy(p_k_2, M+1, N+1, temp3);
-    mat_mul_number(temp3, alpha_k, M, N);
-    mat_plus(w_k, temp3, M, N, w_k_plus1);
+    mat_mul_number(temp3, alpha_k, M+1, N+1);
+    mat_plus(w_k, temp3, M+1, N+1, w_k_plus1);
 
     // считаем ошибку
     mat_copy(w_k, M+1, N+1, temp1);
     mat_copy(w_k_plus1, M+1, N+1, temp2);
-    mat_minus(temp2, temp1, M, N, temp3);
+    mat_minus(temp2, temp1, M+1, N+1, temp3);
     err = norm(temp3, h1, h2, M+1, N+1);
     printf("error: %f\n", err);
 
@@ -253,10 +253,10 @@ int main(int argc, char *argv[]) {
   mat_free(b, M + 1, N + 1);
   mat_free(F, M, N);
 
-  mat_free(temp1, M, N);
-  mat_free(temp2, M, N);
-  mat_free(temp3, M, N);
-  mat_free(temp4, M, N);
+  mat_free(temp1, M+1, N+1);
+  mat_free(temp2, M+1, N+1);
+  mat_free(temp3, M+1, N+1);
+  mat_free(temp4, M+1, N+1);
 
   mat_free(w_k, M + 1, N + 1);
   mat_free(w_k_plus1, M + 1, N + 1);
