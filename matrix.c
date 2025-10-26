@@ -8,11 +8,17 @@
 double scalar_product(double **u, double **v, double h1, double h2, int M,
                       int N) {
   double ans = 0.0;
-  for (int j = 1; j < N - 1; ++j) {
-    for (int i = 1; i < M - 1; ++i) {
-      ans += h1 * h2 * u[j][i] * v[j][i];
-    }
+  int i, j;
+  for (int k = 0; k < M*N; ++k) {
+    i = k % M;
+    j = k / M;
+    ans += h1 * h2 * u[j][i] * v[j][i];
   }
+  //for (int j = 1; j < N - 1; ++j) {
+  //  for (int i = 1; i < M - 1; ++i) {
+  //    ans += h1 * h2 * u[j][i] * v[j][i];
+  //  }
+  //}
   return ans;
 }
 
@@ -23,20 +29,32 @@ double norm(double **u, double h1, double h2, int M, int N) {
 
 // копирование матрицы
 void mat_copy(double **src, int M, int N, double **target) {
-  for (int j = 0; j < N; ++j) {
-    for (int i = 0; i < M; ++i) {
+  int i, j;
+  for (int k = 0; k < M*N; ++k) {
+    i = k % M;
+    j = k / M;
       target[j][i] = src[j][i];
-    }
   }
+  //for (int j = 0; j < N; ++j) {
+  //  for (int i = 0; i < M; ++i) {
+  //    target[j][i] = src[j][i];
+  //  }
+  //}
 }
 
 // установка во все значения матрицы значения val
 void mat_set_value(double **u, int M, int N, int val) {
-  for (int j = 0; j < N; ++j) {
-    for (int i = 0; i < M; ++i) {
-      u[j][i] = val;
-    }
+  int i, j;
+  for (int k = 0; k < M*N; ++k) {
+    i = k % M;
+    j = k / M;
+    u[j][i] = val;
   }
+  //for (int j = 0; j < N; ++j) {
+  //  for (int i = 0; i < M; ++i) {
+  //    u[j][i] = val;
+  //  }
+  //}
 }
 
 // создние матрицы и инициализация всех ее элементов нулем
@@ -59,44 +77,77 @@ void mat_free(double **mat, int M, int N) {
 
 // сложени матицы u и матрицы v поэлементно
 void mat_plus(double **u, double **v, int M, int N, double **ans) {
-  for (int j = 1; j < N - 1; ++j) {
-    for (int i = 1; i < M - 1; ++i) {
-      ans[j][i] = u[j][i] + v[j][i];
-    }
+  int i, j;
+  for (int k = 0; k < M*N; ++k) {
+    i = k % M;
+    j = k / M;
+    ans[j][i] = u[j][i] + v[j][i];
   }
+  //for (int j = 1; j < N; ++j) {
+  //  for (int i = 1; i < M; ++i) {
+  //    ans[j][i] = u[j][i] + v[j][i];
+  //  }
+  //}
   return;
 }
 
 // вычитание из матицы u матрицы v поэлементно
 void mat_minus(double **u, double **v, int M, int N, double **ans) {
-  for (int j = 1; j < N - 1; ++j) {
-    for (int i = 1; i < M - 1; ++i) {
-      ans[j][i] = u[j][i] - v[j][i];
-    }
+  int i, j;
+  for (int k = 0; k < M*N; ++k) {
+    i = k % M;
+    j = k / M;
+    ans[j][i] = u[j][i] - v[j][i];
   }
+  //for (int j = 1; j < N; ++j) {
+  //  for (int i = 1; i < M; ++i) {
+  //    ans[j][i] = u[j][i] - v[j][i];
+  //  }
+  //}
   return;
 }
 
 // умножение всех элементов матрицы на число val
 void mat_mul_number(double **mat, double val, int M, int N) {
-  for (int j = 1; j < N; ++j) {
-    for (int i = 1; i < M; ++i) {
-      mat[j][i] *= val;
-    }
+  int i, j;
+  for (int k = 0; k < M*N; ++k) {
+    i = k % M;
+    j = k / M;
+    mat[j][i] *= val;
   }
+  //for (int j = 1; j < N; ++j) {
+  //  for (int i = 1; i < M; ++i) {
+  //    mat[j][i] *= val;
+  //  }
+  //}
   return;
 }
 
 
 // вывд матрицы в точностью 5 знаков после запятой
 void mat_print(double **mat, int M, int N) {
+  int i, j;
   printf("[");
-  for (int j = N - 1; j >= 0; --j) {
-  printf("[");
-    for (int i = 0; i < M; ++i) {
-      printf("%.5f, ", mat[j][i]);
+  for (int k = 0; k < M*N; ++k) {
+    i = k % M;
+    j = N - (k / M) - 1;
+    if (i == 0) {
+      printf("[");
     }
-    printf("],\n");
+    printf("%.5f, ", mat[j][i]);
+    if (i == M-1) {
+      printf("],\n");
+    }
   }
   printf("]\n\n\n");
+
+  //printf("[");
+  //for (int j = N - 1; j >= 0; --j) {
+  //printf("[");
+  //  for (int i = 0; i < M; ++i) {
+  //    printf("%.5f, ", mat[j][i]);
+  //  }
+  //  printf("],\n");
+  //}
+  //printf("]\n\n\n");
 }
