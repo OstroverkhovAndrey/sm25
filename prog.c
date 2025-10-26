@@ -4,6 +4,8 @@
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <format>
+#include <iomanip>
 
 #include <variant.h>
 #include <matrix.h>
@@ -171,7 +173,7 @@ int main(int argc, char *argv[]) {
   double *r_k_1 = mat_create(M + 1, N + 1);
 
   {
-    printf("Zero iteration\n\n");
+    std::cout << "Zero iteration\n\n";
     // r_k_0 = B - A w_k
     A_fun(a, b, w_k, M, N, h1, h2, temp1);
     B_fun(F, M, N, temp2);
@@ -196,7 +198,7 @@ int main(int argc, char *argv[]) {
     // w_0 = w_1, для зацикливания
     mat_copy(w_k_plus1, M + 1, N + 1, w_k);
   }
-  printf("Start iteration\n\n");
+  std::cout << "Start iteration\n\n";
 
   int i = 0;
   double err = args.delta + 1;
@@ -234,7 +236,7 @@ int main(int argc, char *argv[]) {
     mat_copy(w_k_plus1, M+1, N+1, temp2);
     mat_minus(temp2, temp1, M+1, N+1, temp3);
     err = norm(temp3, h1, h2, M+1, N+1);
-    printf("error: %f\n", err);
+    std::cout << std::fixed << std::setprecision(args.precision) << std::format("error: {:.{}f}\n", err, args.precision);
 
     // копируем значения для зацикливания
     mat_copy(w_k_plus1, M + 1, N + 1, w_k);
@@ -243,10 +245,9 @@ int main(int argc, char *argv[]) {
     mat_copy(r_k_1, M + 1, N + 1, r_k_0);
   }
 
-  printf("\n");
-  printf("Count iteration: %i\n", i);
-  printf("Result w:\n");
-  mat_print(w_k, M+1, N+1);
+  std::cout << std::format("\nCount iteration: {}\n", i) 
+            << "Result w:\n";
+  mat_print(w_k, M+1, N+1, args);
 
   // очищаем память
   mat_free(a, M + 1, N + 1);
@@ -268,6 +269,6 @@ int main(int argc, char *argv[]) {
   mat_free(r_k_1, M + 1, N + 1);
 
   end_time = omp_get_wtime();
-  printf("Work took %f seconds\n", end_time - start_time);
+  std::cout << std::fixed << std::setprecision(args.precision) << std::format("Work took {:.{}f} seconds\n", end_time - start_time, args.precision);
   return 0;
 }

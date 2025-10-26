@@ -1,6 +1,7 @@
 #include <args.h>
 
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 double square_of_max(double a, double b) {
@@ -39,7 +40,8 @@ Args parse_args(int argc, char *argv[]) {
     args.h1 = (args.B1 - args.A1) / (1.0 * args.M);
     args.h2 = (args.B2 - args.A2) / (1.0 * args.N);
     args.eps = square_of_max(args.h1, args.h2);
-    std::cout << "args: N == " << args.N <<
+    std::cout << std::fixed << std::setprecision(args.precision) <<
+                       "args: N == " << args.N <<
                        " M == " << args.M << 
                        " count_iter == " << args.count_iter << 
                        " delta == " << args.delta << 

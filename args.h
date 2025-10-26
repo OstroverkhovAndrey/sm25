@@ -1,3 +1,4 @@
+#pragma once
 
 struct Args {
     int N{10};
@@ -12,6 +13,7 @@ struct Args {
     double h1{0.0};
     double h2{0.0};
     double eps{0.0};
+    int precision{5};
 };
 
 Args parse_args(int argc, char *argv[]);

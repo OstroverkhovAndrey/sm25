@@ -4,15 +4,17 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+#include <format>
 
 // вычисление l_ij
 double calc_l_ij(Point P1, Point P2) {
   if (P1.x != P2.x) {
-    fprintf(stderr, "Error in calc_l_ij, P1.x != P2.x\n");
+    std::cout << "Error in calc_l_ij, P1.x != P2.x\n";
     return 0;
   }
   if (P1.y >= P2.y) {
-    fprintf(stderr, "Error in calc_l_ij, P1.y >= P2.y\n");
+    std::cout << "Error in calc_l_ij, P1.y >= P2.y\n";
     return 0;
   }
   // отрезок P1 P2 лежит вне треугольника
@@ -46,18 +48,18 @@ double calc_l_ij(Point P1, Point P2) {
       return ((-2.0 / 3.0) * P1.x + 2) - 0.0;
   }
 
-  fprintf(stderr, "Error in calc_l_ij, default return\n");
+  std::cout << "Error in calc_l_ij, default return\n";
   return 0;
 }
 
 // вычисление p_ij
 double calc_p_ij(Point P1, Point P2) {
   if (P1.x >= P2.x) {
-    fprintf(stderr, "Error in calc_p_ij, P1.x >= P2.x\n");
+    std::cout << "Error in calc_p_ij, P1.x >= P2.x\n";
     return 0;
   }
   if (P1.y != P2.y) {
-    fprintf(stderr, "Error in calc_p_ij, P1.y != P2.y\n");
+    std::cout << "Error in calc_p_ij, P1.y != P2.y\n";
     return 0;
   }
   // отрезок P1 P2 лежит вне треугольника
@@ -83,7 +85,7 @@ double calc_p_ij(Point P1, Point P2) {
   if (P2.y >= ((-2.0 / 3.0) * P2.x + 2) && P1.y >= ((2.0 / 3.0) * P1.x + 2)) {
     return ((-3.0 / 2.0) * P1.y + 3) - ((3.0 / 2.0) * P1.y - 3);
   }
-  fprintf(stderr, "Error in calc_p_ij, default return\n");
+  std::cout << "Error in calc_p_ij, default return\n";
   return 0;
 }
 
@@ -117,12 +119,12 @@ void test_calc_l_ij() {
     double ans = calc_l_ij(config.P1, config.P2);
     double err = ans - config.ans;
     if (-eps < err && err < eps) {
-      printf("Pass test %i for calc_l_ij\n", i);
+      std::cout << std::format("Pass test {} for calc_l_ij\n", i);
     } else {
-      printf("Faild test %i for calc_l_ij\n", i);
+      std::cout << std::format("Faild test {} for calc_l_ij\n", i);
     }
   }
-  printf("\n");
+  std::cout << std::endl;
 }
 
 void test_calc_p_ij() {
@@ -147,12 +149,12 @@ void test_calc_p_ij() {
     double ans = calc_p_ij(config.P1, config.P2);
     double err = ans - config.ans;
     if (-eps < err && err < eps) {
-      printf("Pass test %i for calc_p_ij\n", i);
+      std::cout << std::format("Pass test {} for calc_p_ij\n", i);
     } else {
-      printf("Faild test %i for calc_p_ij\n", i);
+      std::cout << std::format("Faild test {} for calc_p_ij\n", i);
     }
   }
-  printf("\n");
+  std::cout << std::endl;
 }
 
 // считает площадь методом шнурков
@@ -343,9 +345,10 @@ void test_calc_S_ij() {
     double ans = calc_S_ij(config.h1, config.h2, config.P);
     double err = ans - config.ans;
     if (-eps < err && err < eps) {
-      printf("Pass test %i for calc_S_ij\n", i);
+      std::cout << std::format("Pass test {} for calc_S_ij\n", i);
     } else {
-      printf("Faild test %i for calc_S_ij\n", i);
+      std::cout << std::format("Faild test {} for calc_S_ij\n", i);
     }
   }
+  printf("\n");
 }

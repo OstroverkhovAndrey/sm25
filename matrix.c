@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <iomanip>
+#include <iostream>
 
 // вычисление скалярного произведения
 double scalar_product(double *u, double *v, double h1, double h2, int M,
@@ -14,11 +16,6 @@ double scalar_product(double *u, double *v, double h1, double h2, int M,
     j = k / M;
     ans += h1 * h2 * u[j*M+i] * v[j*M+i];
   }
-  //for (int j = 1; j < N - 1; ++j) {
-  //  for (int i = 1; i < M - 1; ++i) {
-  //    ans += h1 * h2 * u[j][i] * v[j][i];
-  //  }
-  //}
   return ans;
 }
 
@@ -35,11 +32,6 @@ void mat_copy(double *src, int M, int N, double *target) {
     j = k / M;
       target[j*M+i] = src[j*M+i];
   }
-  //for (int j = 0; j < N; ++j) {
-  //  for (int i = 0; i < M; ++i) {
-  //    target[j][i] = src[j][i];
-  //  }
-  //}
 }
 
 // установка во все значения матрицы значения val
@@ -50,11 +42,6 @@ void mat_set_value(double *u, int M, int N, int val) {
     j = k / M;
     u[j*M+i] = val;
   }
-  //for (int j = 0; j < N; ++j) {
-  //  for (int i = 0; i < M; ++i) {
-  //    u[j][i] = val;
-  //  }
-  //}
 }
 
 // создние матрицы и инициализация всех ее элементов нулем
@@ -77,11 +64,6 @@ void mat_plus(double *u, double *v, int M, int N, double *ans) {
     j = k / M;
     ans[j*M+i] = u[j*M+i] + v[j*M+i];
   }
-  //for (int j = 1; j < N; ++j) {
-  //  for (int i = 1; i < M; ++i) {
-  //    ans[j][i] = u[j][i] + v[j][i];
-  //  }
-  //}
   return;
 }
 
@@ -93,11 +75,6 @@ void mat_minus(double *u, double *v, int M, int N, double *ans) {
     j = k / M;
     ans[j*M+i] = u[j*M+i] - v[j*M+i];
   }
-  //for (int j = 1; j < N; ++j) {
-  //  for (int i = 1; i < M; ++i) {
-  //    ans[j][i] = u[j][i] - v[j][i];
-  //  }
-  //}
   return;
 }
 
@@ -109,39 +86,24 @@ void mat_mul_number(double *mat, double val, int M, int N) {
     j = k / M;
     mat[j*M+i] *= val;
   }
-  //for (int j = 1; j < N; ++j) {
-  //  for (int i = 1; i < M; ++i) {
-  //    mat[j][i] *= val;
-  //  }
-  //}
   return;
 }
 
 
 // вывд матрицы в точностью 5 знаков после запятой
-void mat_print(double *mat, int M, int N) {
+void mat_print(double *mat, int M, int N, Args args) {
   int i, j;
-  printf("[");
+  std::cout << "[";
   for (int k = 0; k < M*N; ++k) {
     i = k % M;
     j = N - (k / M) - 1;
     if (i == 0) {
-      printf("[");
+      std::cout << "[";
     }
-    printf("%.5f, ", mat[j*M+i]);
+    std::cout << std::fixed << std::setprecision(args.precision) << mat[j*M+i] << ", ";
     if (i == M-1) {
-      printf("],\n");
+      std::cout << "],\n";
     }
   }
-  printf("]\n\n\n");
-
-  //printf("[");
-  //for (int j = N - 1; j >= 0; --j) {
-  //printf("[");
-  //  for (int i = 0; i < M; ++i) {
-  //    printf("%.5f, ", mat[j][i]);
-  //  }
-  //  printf("],\n");
-  //}
-  //printf("]\n\n\n");
+  std::cout << "]\n\n";
 }

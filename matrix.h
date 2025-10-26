@@ -1,4 +1,6 @@
 
+#include <args.h>
+
 double scalar_product(double *u, double *v, double h1, double h2, int M,
                       int N);
 
@@ -18,4 +20,4 @@ void mat_minus(double *u, double *v, int M, int N, double *ans);
 
 void mat_mul_number(double *mat, double val, int M, int N);
 
-void mat_print(double *mat, int M, int N);
+void mat_print(double *mat, int M, int N, Args args);
