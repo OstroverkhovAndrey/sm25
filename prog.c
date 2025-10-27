@@ -80,46 +80,46 @@ double calc_F_ij(double h1, double h2, Point p) {
 }
 
 // инициализируем и заполняем матрицу a
-double *init_a(int M, int N, double h1, double h2, double eps) {
+double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
   double *a = mat_create(M + 1, N + 1);
   int i, j;
   for (int k = 0; k < N * M; ++k) {
     i = (k % M) + 1;
     j = (k / M) + 1;
     Point p1;
-    p1.x = i * h1 - 0.5 * h1 - 4, p1.y = j * h2 - 0.5 * h2 - 1;
+    p1.x = i * h1 - 0.5 * h1 + args.A1, p1.y = j * h2 - 0.5 * h2 + args.A2;
     Point p2;
-    p2.x = i * h1 - 0.5 * h1 - 4, p2.y = j * h2 + 0.5 * h2 - 1;
+    p2.x = i * h1 - 0.5 * h1 + args.A1, p2.y = j * h2 + 0.5 * h2 + args.A2;
     a[j * (M + 1) + i] = calc_a_ij(h2, p1, p2, eps);
   }
   return a;
 }
 
 // инициализируем и заполняем матрицу b
-double *init_b(int M, int N, double h1, double h2, double eps) {
+double *init_b(int M, int N, double h1, double h2, double eps, Args args) {
   double *b = mat_create(M + 1, N + 1);
   int i, j;
   for (int k = 0; k < N * M; ++k) {
     i = (k % M) + 1;
     j = (k / M) + 1;
     Point p1;
-    p1.x = i * h1 - 0.5 * h1 - 4, p1.y = j * h2 - 0.5 * h2 - 1;
+    p1.x = i * h1 - 0.5 * h1 + args.A1, p1.y = j * h2 - 0.5 * h2 + args.A2;
     Point p2;
-    p2.x = i * h1 + 0.5 * h1 - 4, p2.y = j * h2 - 0.5 * h2 - 1;
+    p2.x = i * h1 + 0.5 * h1 + args.A1, p2.y = j * h2 - 0.5 * h2 + args.A2;
     b[j * (M + 1) + i] = calc_b_ij(h1, p1, p2, eps);
   }
   return b;
 }
 
 // инициализируем и заполняем матрицу F
-double *init_F(int M, int N, double h1, double h2, double eps) {
+double *init_F(int M, int N, double h1, double h2, double eps, Args args) {
   double *F = mat_create(M + 1, N + 1);
   int i, j;
   for (int k = 0; k < N * M; ++k) {
     i = (k % M) + 1;
     j = (k / M) + 1;
     Point p;
-    p.x = i * h1 - 4, p.y = j * h2 - 1;
+    p.x = i * h1 + args.A1, p.y = j * h2 + args.A2;
     F[j * (M + 1) + i] = calc_F_ij(h1, h2, p);
   }
   return F;
@@ -157,9 +157,9 @@ int main(int argc, char *argv[]) {
   double alpha_k;
 
   double *a, *b, *F;
-  a = init_a(args.M, args.N, h1, h2, eps);
-  b = init_b(args.M, args.N, h1, h2, eps);
-  F = init_F(args.M, args.N, h1, h2, eps);
+  a = init_a(M, N, h1, h2, eps, args);
+  b = init_b(M, N, h1, h2, eps, args);
+  F = init_F(M, N, h1, h2, eps, args);
 
   double *w_k = mat_create(M + 1, N + 1);
   double *w_k_plus1 = mat_create(M + 1, N + 1);
