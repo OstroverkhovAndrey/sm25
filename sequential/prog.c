@@ -1,5 +1,4 @@
 
-#include <format>
 #include <iomanip>
 #include <iostream>
 #include <math.h>
@@ -241,7 +240,7 @@ int main(int argc, char *argv[]) {
     mat_minus(temp2, temp1, M + 1, N + 1, temp3);
     err = norm(temp3, h1, h2, M + 1, N + 1);
     std::cout << std::fixed << std::setprecision(args.precision)
-              << std::format("error: {:.{}f}\n", err, args.precision);
+              << "error: " << err << std::endl;
 
     // копируем значения для зацикливания
     mat_copy(w_k_plus1, M + 1, N + 1, w_k);
@@ -250,7 +249,7 @@ int main(int argc, char *argv[]) {
     mat_copy(r_k_1, M + 1, N + 1, r_k_0);
   }
 
-  std::cout << std::format("\nCount iteration: {}\n", i) << "Result w:\n";
+  std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
   mat_print(w_k, M + 1, N + 1, args);
 
   // очищаем память
@@ -274,7 +273,6 @@ int main(int argc, char *argv[]) {
 
   end_time = omp_get_wtime();
   std::cout << std::fixed << std::setprecision(args.precision)
-            << std::format("Work took {:.{}f} seconds\n", end_time - start_time,
-                           args.precision);
+            << "Work took " << end_time - start_time << " seconds\n";
   return 0;
 }

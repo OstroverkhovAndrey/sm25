@@ -119,9 +119,9 @@ void test_calc_l_ij() {
     double ans = calc_l_ij(config.P1, config.P2);
     double err = ans - config.ans;
     if (-eps < err && err < eps) {
-      std::cout << std::format("Pass test {} for calc_l_ij\n", i);
+      std::cout << "Pass test " << i << " for calc_l_ij\n";
     } else {
-      std::cout << std::format("Faild test {} for calc_l_ij\n", i);
+      std::cout << "Faild test " << i << " for calc_l_ij\n";
     }
   }
   std::cout << std::endl;
@@ -149,9 +149,9 @@ void test_calc_p_ij() {
     double ans = calc_p_ij(config.P1, config.P2);
     double err = ans - config.ans;
     if (-eps < err && err < eps) {
-      std::cout << std::format("Pass test {} for calc_p_ij\n", i);
+      std::cout << "Pass test " << i << " for calc_p_ij\n";
     } else {
-      std::cout << std::format("Faild test {} for calc_p_ij\n", i);
+      std::cout << "Faild test " << i << " for calc_p_ij\n";
     }
   }
   std::cout << std::endl;
@@ -345,9 +345,9 @@ void test_calc_S_ij() {
     double ans = calc_S_ij(config.h1, config.h2, config.P);
     double err = ans - config.ans;
     if (-eps < err && err < eps) {
-      std::cout << std::format("Pass test {} for calc_S_ij\n", i);
+      std::cout << "Pass test " << i << " for calc_S_ij\n";
     } else {
-      std::cout << std::format("Faild test {} for calc_S_ij\n", i);
+      std::cout << "Faild test " << i << " for calc_S_ij\n";
     }
   }
   printf("\n");
