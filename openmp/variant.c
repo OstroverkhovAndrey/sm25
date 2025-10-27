@@ -1,7 +1,6 @@
 
 #include <variant.h>
 
-#include <format>
 #include <iostream>
 #include <math.h>
 #include <stdio.h>
