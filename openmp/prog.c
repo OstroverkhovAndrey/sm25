@@ -16,8 +16,8 @@ void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
   int i, j;
   #pragma omp parallel for schedule(static)
   for (int k = 0; k < (N - 1) * (M - 1); ++k) {
-    i = (k % (M - 1)) + 1;
-    j = (k / (M - 1)) + 1;
+    int i = (k % (M - 1)) + 1;
+    int j = (k / (M - 1)) + 1;
     double s1 = ((a[j * (M + 1) + (i + 1)] *
                   (w[j * (M + 1) + (i + 1)] - w[j * (M + 1) + i]) / h1) -
                  (a[j * (M + 1) + i] *

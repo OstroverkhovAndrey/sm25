@@ -11,10 +11,10 @@
 double scalar_product(double *u, double *v, double h1, double h2, int M,
                       int N) {
   double ans = 0.0;
-  int i, j;
+  #pragma omp parallel for reduction(+:ans) schedule(static)
   for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
+    int i = k % M;
+    int j = k / M;
     ans += h1 * h2 * u[j * M + i] * v[j * M + i];
   }
   return ans;
