@@ -13,7 +13,6 @@
 // оператор A
 void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
-  int i, j;
   #pragma omp parallel for schedule(static)
   for (int k = 0; k < (N - 1) * (M - 1); ++k) {
     int i = (k % (M - 1)) + 1;
@@ -35,11 +34,10 @@ void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
 
 // оператор B
 void B_fun(double *F, int M, int N, double *ans) {
-  int i, j;
   #pragma omp parallel for schedule(static)
   for (int k = 0; k < (N - 1) * (M - 1); ++k) {
-    i = (k % (M - 1)) + 1;
-    j = (k / (M - 1)) + 1;
+    int i = (k % (M - 1)) + 1;
+    int j = (k / (M - 1)) + 1;
     ans[j * (M + 1) + i] = F[j * (M + 1) + i];
   }
   return;
@@ -48,11 +46,10 @@ void B_fun(double *F, int M, int N, double *ans) {
 // оператор D
 void D_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
-  int i, j;
   #pragma omp parallel for schedule(static)
   for (int k = 0; k < (N - 1) * (M - 1); ++k) {
-    i = (k % (M - 1)) + 1;
-    j = (k / (M - 1)) + 1;
+    int i = (k % (M - 1)) + 1;
+    int j = (k / (M - 1)) + 1;
     double d = ((a[j * (M + 1) + (i + 1)] + a[j * (M + 1) + i]) / (h1 * h1)) +
                ((b[(j + 1) * (M + 1) + i] + b[j * (M + 1) + i]) / (h2 * h2));
     ans[j * (M + 1) + i] = w[j * (M + 1) + i] / d;
