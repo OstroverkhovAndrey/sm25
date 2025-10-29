@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <args.h>
-#include <matrix.h>
-#include <variant.h>
+#include <args.hpp>
+#include <matrix.hpp>
+#include <variant.hpp>
 
 // оператор A
 void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
-  mat_print(w_k, M + 1, N + 1, args);
+  //mat_print(w_k, M + 1, N + 1, args);
 
   // очищаем память
   mat_free(a, M + 1, N + 1);

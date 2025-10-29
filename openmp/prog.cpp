@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <args.h>
-#include <matrix.h>
-#include <variant.h>
+#include <args.hpp>
+#include <matrix.hpp>
+#include <variant.hpp>
 
 // оператор A
 void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
