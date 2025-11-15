@@ -197,7 +197,7 @@ void send_v_f(double *v, Args args) {
       // слева напрао
       double* send_v = (double*)malloc((size_t)n * sizeof(double));
       for (int i = 0; i < n; ++i) {
-          send_v[i] = v[(i+1)*(m+2) + n];
+          send_v[i] = v[(i+1)*(m+2) + m];
       }
       MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
                            args.right, 100,  // dest, tag
@@ -221,7 +221,7 @@ void send_v_f(double *v, Args args) {
                            args.comm2d, &st);
       //if (args.coords[0] != args.dims[0]-1) {
           for (int i = 0; i < n; ++i) {
-              v[(i+1)*(m+2) + n+1] = send_v[i];
+              v[(i+1)*(m+2) + m+1] = send_v[i];
           }
       //}
   }
@@ -344,8 +344,6 @@ int main(int argc, char *argv[]) {
     mat_copy(z_k_0, args.M_field + 2, args.N_field + 2, p_k_1);
 
     // alpha_k == (z_0, k_0) / (Ap_1, p_1)
-    // обмениваемся данными с соседними процессами
-    send_v_f(p_k_1, args);
     A_fun(a, b, p_k_1, args.M_field, args.N_field, h1, h2, temp3);
     alpha_k = scalar_product(z_k_0, r_k_0, h1, h2, args.M_field + 2,
                              args.N_field + 2, args) /
@@ -360,6 +358,8 @@ int main(int argc, char *argv[]) {
     // w_0 = w_1, для зацикливания
     mat_copy(w_k_plus1, args.M_field + 2, args.N_field + 2, w_k);
 
+    // обмениваемся данными с соседними процессами
+    send_v_f(p_k_1, args);
   }
   // std::cout << "Start iteration\n\n";
 
@@ -368,8 +368,6 @@ int main(int argc, char *argv[]) {
   for (; stop_iter(i, err, args); ++i) {
 
     // r_k_1 == r_k_0 - alpha_k A p_k_1
-    // обмениваемся данными с соседними процессами
-    send_v_f(p_k_1, args);
     A_fun(a, b, p_k_1, M, N, h1, h2, temp1);
     mat_mul_number(temp1, alpha_k, M + 2, N + 2);
     mat_minus(r_k_0, temp1, M + 2, N + 2, r_k_1);
@@ -387,8 +385,6 @@ int main(int argc, char *argv[]) {
     mat_plus(z_k_1, p_k_1, M + 2, N + 2, p_k_2);
 
     // alpha_k == (z_0, k_0) / (Ap_1, p_1)
-    // обмениваемся данными с соседними процессами
-    send_v_f(p_k_2, args);
     A_fun(a, b, p_k_2, M, N, h1, h2, temp2);
     alpha_k = scalar_product(z_k_1, r_k_1, h1, h2, M + 2, N + 2, args) /
               scalar_product(temp2, p_k_2, h1, h2, M + 2, N + 2, args);
@@ -413,6 +409,8 @@ int main(int argc, char *argv[]) {
     mat_copy(p_k_2, M + 2, N + 2, p_k_1);
     mat_copy(r_k_1, M + 2, N + 2, r_k_0);
 
+    // обмениваемся данными с соседними процессами
+    send_v_f(p_k_1, args);
   }
 
   // std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
