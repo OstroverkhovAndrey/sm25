@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
         for (int i = 0; i < n; ++i) {
             send_v[i] = v[m-1 +1][i+1];
         }
-        MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE,
+        MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
                              down, 100,  // dest, tag
                              up,  100,  // source, tag
                              comm2d, &st);
@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
             send_v[i] = v[1][i+1];
         }
         // Обмен с левым/правым соседом: отправляем вправо, получаем слева
-        MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE,
+        MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
                              up, 100,  // dest, tag
                              down,  100,  // source, tag
                              comm2d, &st);

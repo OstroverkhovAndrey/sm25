@@ -171,6 +171,81 @@ bool stop_iter(int i, double err, Args args) {
   return false;
 }
 
+void send_v(double *v, Args args) {
+
+   MPI_Status st;
+
+   int n = args.N_field;
+   int m = args.M_field;
+    
+      {
+        // слева напрао
+        double* send_v = (double*)malloc((size_t)n * sizeof(double));
+        for (int i = 0; i < n; ++i) {
+            send_v[i] = v[(i+1)*(m+2) + n-1 +1];
+        }
+        MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
+                             args.right, 100,  // dest, tag
+                             args.left,  100,  // source, tag
+                             args.comm2d, &st);
+        if (args.coords[0] != 0) {
+            for (int i = 0; i < n; ++i) {
+                v[(i+1)*(m+2) + 0] = send_v[i];
+            }
+        }
+    }
+    {
+        // справа на лево
+        double* send_v = (double*)malloc((size_t)n * sizeof(double));
+        for (int i = 0; i < n; ++i) {
+            send_v[i] = v[(i+1)*(m+2) + 1];
+        }
+        MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
+                             args.left, 100,  // dest, tag
+                             args.right,  100,  // source, tag
+                             args.comm2d, &st);
+        if (args.coords[0] != args.dims[0]-1) {
+            for (int i = 0; i < n; ++i) {
+                v[(i+1)*(m+2) + n+1] = send_v[i];
+            }
+        }
+    }
+    {
+        // сверху вниз
+        double* send_v = (double*)malloc((size_t)m * sizeof(double));
+        for (int i = 0; i < m; ++i) {
+            send_v[i] = v[(m-1 +1)*(m+2) + i+1];
+        }
+        MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE,
+                             args.down, 100,  // dest, tag
+                             args.up,  100,  // source, tag
+                             args.comm2d, &st);
+        if (args.coords[1] != 0) {
+            for (int i = 0; i < m; ++i) {
+                v[(0)*(m+2) + i+1] = send_v[i];
+            }
+        }
+    }
+    {
+        // справа на лево
+        double* send_v = (double*)malloc((size_t)m * sizeof(double));
+        for (int i = 0; i < m; ++i) {
+            send_v[i] = v[(1)*(m+2) + i+1];
+        }
+        // Обмен с левым/правым соседом: отправляем вправо, получаем слева
+        MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE,
+                             args.up, 100,  // dest, tag
+                             args.down,  100,  // source, tag
+                             args.comm2d, &st);
+        if (args.coords[1] != args.dims[1]-1) {
+            for (int i = 0; i < m; ++i) {
+                v[(m+1)*(m+2) + i+1] = send_v[i];
+            }
+        }
+    }
+
+}
+
 int main(int argc, char *argv[]) {
 
   MPI_Init(&argc, &argv);
@@ -187,7 +262,7 @@ int main(int argc, char *argv[]) {
   start_time = omp_get_wtime();
 
   // алиасы
-  //const int &N = args.N, M = args.M;
+  const int &N = args.N_field, M = args.M_field;
   const double &h1 = args.h1;
   const double &h2 = args.h2;
   const double &eps = args.eps;
@@ -237,56 +312,61 @@ int main(int argc, char *argv[]) {
     mat_mul_number(temp4, alpha_k,  args.M_field + 2, args.N_field + 2);
     mat_plus(w_k, temp4, args.M_field + 2, args.N_field + 2, w_k_plus1);
 
+    // обмениваемся данными с соседними процессами
+    send_v(w_k, args);
+
     // w_0 = w_1, для зацикливания
     mat_copy(w_k_plus1, args.M_field + 2, args.N_field + 2, w_k);
+
   }
   // std::cout << "Start iteration\n\n";
 
   int i = 0;
   double err = args.delta + 1;
-  //for (; stop_iter(i, err, args); ++i) {
+  for (; stop_iter(i, err, args); ++i) {
 
-  //  // r_k_1 == r_k_0 - alpha_k A p_k_1
-  //  A_fun(a, b, p_k_1, M, N, h1, h2, temp1);
-  //  mat_mul_number(temp1, alpha_k, M + 1, N + 1);
-  //  mat_minus(r_k_0, temp1, M + 1, N + 1, r_k_1);
+    // r_k_1 == r_k_0 - alpha_k A p_k_1
+    A_fun(a, b, p_k_1, M, N, h1, h2, temp1);
+    mat_mul_number(temp1, alpha_k, M + 2, N + 2);
+    mat_minus(r_k_0, temp1, M + 2, N + 2, r_k_1);
 
-  //  // z_k = r_k / D;
-  //  D_fun(a, b, r_k_1, M, N, h1, h2, z_k_1);
+    // z_k = r_k / D;
+    D_fun(a, b, r_k_1, M, N, h1, h2, z_k_1);
 
-  //  // betta == (z_k_1, r_k_1) / (z_k_0, z_k_0)
-  //  double betta = scalar_product(z_k_1, r_k_1, h1, h2, M + 1, N + 1) /
-  //                 scalar_product(z_k_0, r_k_0, h1, h2, M + 1, N + 1);
+    // betta == (z_k_1, r_k_1) / (z_k_0, z_k_0)
+    double betta = scalar_product(z_k_1, r_k_1, h1, h2, M + 2, N + 2, args) /
+                   scalar_product(z_k_0, r_k_0, h1, h2, M + 2, N + 2, args);
 
-  //  // p_k_2 = z_k + betta_k * p_k_1; // тут меняется p_k_1 но он больше не
-  //  // используется
-  //  mat_mul_number(p_k_1, betta, M + 1, N + 1);
-  //  mat_plus(z_k_1, p_k_1, M + 1, N + 1, p_k_2);
+    // p_k_2 = z_k + betta_k * p_k_1; // тут меняется p_k_1 но он больше не
+    // используется
+    mat_mul_number(p_k_1, betta, M + 2, N + 2);
+    mat_plus(z_k_1, p_k_1, M + 2, N + 2, p_k_2);
 
-  //  // alpha_k == (z_0, k_0) / (Ap_1, p_1)
-  //  A_fun(a, b, p_k_2, M, N, h1, h2, temp2);
-  //  alpha_k = scalar_product(z_k_1, r_k_1, h1, h2, M + 1, N + 1) /
-  //            scalar_product(temp2, p_k_2, h1, h2, M + 1, N + 1);
+    // alpha_k == (z_0, k_0) / (Ap_1, p_1)
+    A_fun(a, b, p_k_2, M, N, h1, h2, temp2);
+    alpha_k = scalar_product(z_k_1, r_k_1, h1, h2, M + 2, N + 2, args) /
+              scalar_product(temp2, p_k_2, h1, h2, M + 2, N + 2, args);
 
-  //  // w_1 == w_0 + alpha_k * p_k_2
-  //  mat_copy(p_k_2, M + 1, N + 1, temp3);
-  //  mat_mul_number(temp3, alpha_k, M + 1, N + 1);
-  //  mat_plus(w_k, temp3, M + 1, N + 1, w_k_plus1);
+    // w_1 == w_0 + alpha_k * p_k_2
+    mat_copy(p_k_2, M + 2, N + 2, temp3);
+    mat_mul_number(temp3, alpha_k, M + 2, N + 2);
+    mat_plus(w_k, temp3, M + 2, N + 2, w_k_plus1);
 
-  //  // считаем ошибку
-  //  mat_copy(w_k, M + 1, N + 1, temp1);
-  //  mat_copy(w_k_plus1, M + 1, N + 1, temp2);
-  //  mat_minus(temp2, temp1, M + 1, N + 1, temp3);
-  //  err = norm(temp3, h1, h2, M + 1, N + 1, args);
-  //  std::cout << std::fixed << std::setprecision(args.precision)
-  //            << "error: " << err << std::endl;
+    // считаем ошибку
+    mat_copy(w_k, M + 2, N + 2, temp1);
+    mat_copy(w_k_plus1, M + 2, N + 2, temp2);
+    mat_minus(temp2, temp1, M + 2, N + 2, temp3);
+    err = norm(temp3, h1, h2, M + 2, N + 2, args);
 
-  //  // копируем значения для зацикливания
-  //  mat_copy(w_k_plus1, M + 1, N + 1, w_k);
-  //  mat_copy(z_k_1, M + 1, N + 1, z_k_0);
-  //  mat_copy(p_k_2, M + 1, N + 1, p_k_1);
-  //  mat_copy(r_k_1, M + 1, N + 1, r_k_0);
-  //}
+    //std::cout << std::fixed << std::setprecision(args.precision)
+    //          << "error: " << err << std::endl;
+
+    // копируем значения для зацикливания
+    mat_copy(w_k_plus1, M + 2, N + 2, w_k);
+    mat_copy(z_k_1, M + 2, N + 2, z_k_0);
+    mat_copy(p_k_2, M + 2, N + 2, p_k_1);
+    mat_copy(r_k_1, M + 2, N + 2, r_k_0);
+  }
 
   // std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
   fflush(stdout);
