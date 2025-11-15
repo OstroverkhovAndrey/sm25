@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
-  //mat_print(w_k, M + 1, N + 1, args);
+  mat_print(w_k, M + 1, N + 1, args);
 
   // очищаем память
   mat_free(a, M + 1, N + 1);
