@@ -193,38 +193,38 @@ void send_v_f(double *v, Args args) {
   int n = args.N_field;
   int m = args.M_field;
 
-  //{
-  //    // слева напрао
-  //    double* send_v = (double*)malloc((size_t)n * sizeof(double));
-  //    for (int i = 0; i < n; ++i) {
-  //        send_v[i] = v[(i+1)*(m+2) + n-1 +1];
-  //    }
-  //    MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
-  //                         args.right, 100,  // dest, tag
-  //                         args.left,  100,  // source, tag
-  //                         args.comm2d, &st);
-  //    if (args.coords[0] != 0) {
-  //        for (int i = 0; i < n; ++i) {
-  //            v[(i+1)*(m+2) + 0] = send_v[i];
-  //        }
-  //    }
-  //}
-  //{
-  //    // справа на лево
-  //    double* send_v = (double*)malloc((size_t)n * sizeof(double));
-  //    for (int i = 0; i < n; ++i) {
-  //        send_v[i] = v[(i+1)*(m+2) + 1];
-  //    }
-  //    MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
-  //                         args.left, 200,  // dest, tag
-  //                         args.right,  200,  // source, tag
-  //                         args.comm2d, &st);
-  //    if (args.coords[0] != args.dims[0]-1) {
-  //        for (int i = 0; i < n; ++i) {
-  //            v[(i+1)*(m+2) + n+1] = send_v[i];
-  //        }
-  //    }
-  //}
+  {
+      // слева напрао
+      double* send_v = (double*)malloc((size_t)n * sizeof(double));
+      for (int i = 0; i < n; ++i) {
+          send_v[i] = v[(i+1)*(m+2) + n];
+      }
+      MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
+                           args.right, 100,  // dest, tag
+                           args.left,  100,  // source, tag
+                           args.comm2d, &st);
+      //if (args.coords[0] != 0) {
+          for (int i = 0; i < n; ++i) {
+              v[(i+1)*(m+2) + 0] = send_v[i];
+          }
+      //}
+  }
+  {
+      // справа на лево
+      double* send_v = (double*)malloc((size_t)n * sizeof(double));
+      for (int i = 0; i < n; ++i) {
+          send_v[i] = v[(i+1)*(m+2) + 1];
+      }
+      MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
+                           args.left, 200,  // dest, tag
+                           args.right,  200,  // source, tag
+                           args.comm2d, &st);
+      //if (args.coords[0] != args.dims[0]-1) {
+          for (int i = 0; i < n; ++i) {
+              v[(i+1)*(m+2) + n+1] = send_v[i];
+          }
+      //}
+  }
   {
     // сверху вниз
     double *send_v = (double *)malloc((size_t)m * sizeof(double));
@@ -359,7 +359,7 @@ int main(int argc, char *argv[]) {
     mat_copy(w_k_plus1, args.M_field + 2, args.N_field + 2, w_k);
 
     // обмениваемся данными с соседними процессами
-    send_v_f(w_k, args);
+    send_v_f(p_k_1, args);
   }
   // std::cout << "Start iteration\n\n";
 
@@ -410,7 +410,7 @@ int main(int argc, char *argv[]) {
     mat_copy(r_k_1, M + 2, N + 2, r_k_0);
 
     // обмениваемся данными с соседними процессами
-    send_v_f(w_k, args);
+    send_v_f(p_k_1, args);
   }
 
   // std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
