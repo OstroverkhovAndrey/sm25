@@ -18,7 +18,7 @@ struct Args {
   int precision{5};
   int N_field{-1};
   int M_field{-1};
-  int dims[2]{0,0};
+  int dims[2]{0, 0};
   int world_rank{-1};
   int world_size{-1};
   MPI_Comm comm2d;
@@ -32,7 +32,6 @@ struct Args {
 
   double A1_field{-4.0};
   double A2_field{-1.0};
-
 };
 
 Args parse_args(int argc, char *argv[]);

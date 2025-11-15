@@ -1,23 +1,29 @@
 #include <matrix.hpp>
 
-#include <mpi.h>
 #include <iomanip>
 #include <iostream>
 #include <math.h>
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <args.hpp>
 
 // вычисление скалярного произведения
-double scalar_product(double *u, double *v, double h1, double h2, int M,
-                      int N, Args args) {
+double scalar_product(double *u, double *v, double h1, double h2, int M, int N,
+                      Args args) {
   double ans = 0.0;
-  int i, j;
-  for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
-    ans += h1 * h2 * u[j * M + i] * v[j * M + i];
+  //int i, j;
+  //for (int k = 0; k < (M-2) * (N-2); ++k) {
+  //  i = k % M + 1;
+  //  j = k / M + 1;
+  //  ans += h1 * h2 * u[j * M + i] * v[j * M + i];
+  //}
+
+  for (int j = 1; j < N-1; ++j) {
+    for (int i = 1; i < M-1; ++i) {
+      ans += h1 * h2 * u[j * M + i] * v[j * M + i];
+    }
   }
   double global_ans = 0.0;
   MPI_Allreduce(&ans, &global_ans, 1, MPI_DOUBLE, MPI_SUM, args.comm2d);

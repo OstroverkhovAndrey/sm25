@@ -1,7 +1,8 @@
 
 #include <args.hpp>
 
-double scalar_product(double *u, double *v, double h1, double h2, int M, int N, Args args);
+double scalar_product(double *u, double *v, double h1, double h2, int M, int N,
+                      Args args);
 
 double norm(double *u, double h1, double h2, int M, int N, Args args);
 
