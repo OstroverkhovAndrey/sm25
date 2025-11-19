@@ -58,7 +58,7 @@ void B_fun(double *F, int M, int N, double *ans) {
   // }
   for (int j = 1; j < N + 1; ++j) {
     for (int i = 1; i < M + 1; ++i) {
-     ans[j * (M + 2) + i] = F[j * (M + 2) + i];
+      ans[j * (M + 2) + i] = F[j * (M + 2) + i];
     }
   }
   return;
@@ -67,14 +67,15 @@ void B_fun(double *F, int M, int N, double *ans) {
 // оператор D
 void D_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
-  //int i, j;
-  //for (int k = 0; k < (N - 0) * (M - 0); ++k) {
-  //  i = (k % (M - 0)) + 1;
-  //  j = (k / (M - 0)) + 1;
-  //  double d = ((a[j * (M + 2) + (i + 1)] + a[j * (M + 2) + i]) / (h1 * h1)) +
-  //             ((b[(j + 1) * (M + 2) + i] + b[j * (M + 2) + i]) / (h2 * h2));
-  //  ans[j * (M + 2) + i] = w[j * (M + 2) + i] / d;
-  //}
+  // int i, j;
+  // for (int k = 0; k < (N - 0) * (M - 0); ++k) {
+  //   i = (k % (M - 0)) + 1;
+  //   j = (k / (M - 0)) + 1;
+  //   double d = ((a[j * (M + 2) + (i + 1)] + a[j * (M + 2) + i]) / (h1 * h1))
+  //   +
+  //              ((b[(j + 1) * (M + 2) + i] + b[j * (M + 2) + i]) / (h2 * h2));
+  //   ans[j * (M + 2) + i] = w[j * (M + 2) + i] / d;
+  // }
   for (int j = 1; j < N + 1; ++j) {
     for (int i = 1; i < M + 1; ++i) {
       double d = ((a[j * (M + 2) + (i + 1)] + a[j * (M + 2) + i]) / (h1 * h1)) +
@@ -194,36 +195,34 @@ void send_v_f(double *v, Args args) {
   int m = args.M_field;
 
   {
-      // слева напрао
-      double* send_v = (double*)malloc((size_t)n * sizeof(double));
-      for (int i = 0; i < n; ++i) {
-          send_v[i] = v[(i+1)*(m+2) + m];
-      }
-      MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
-                           args.right, 100,  // dest, tag
-                           args.left,  100,  // source, tag
-                           args.comm2d, &st);
-      //if (args.coords[0] != 0) {
-          for (int i = 0; i < n; ++i) {
-              v[(i+1)*(m+2) + 0] = send_v[i];
-          }
-      //}
+    // слева напрао
+    double *send_v = (double *)malloc((size_t)n * sizeof(double));
+    for (int i = 0; i < n; ++i) {
+      send_v[i] = v[(i + 1) * (m + 2) + m];
+    }
+    MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE, args.right, 100, // dest, tag
+                         args.left, 100,                         // source, tag
+                         args.comm2d, &st);
+    // if (args.coords[0] != 0) {
+    for (int i = 0; i < n; ++i) {
+      v[(i + 1) * (m + 2) + 0] = send_v[i];
+    }
+    //}
   }
   {
-      // справа на лево
-      double* send_v = (double*)malloc((size_t)n * sizeof(double));
-      for (int i = 0; i < n; ++i) {
-          send_v[i] = v[(i+1)*(m+2) + 1];
-      }
-      MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE,
-                           args.left, 200,  // dest, tag
-                           args.right,  200,  // source, tag
-                           args.comm2d, &st);
-      //if (args.coords[0] != args.dims[0]-1) {
-          for (int i = 0; i < n; ++i) {
-              v[(i+1)*(m+2) + m+1] = send_v[i];
-          }
-      //}
+    // справа на лево
+    double *send_v = (double *)malloc((size_t)n * sizeof(double));
+    for (int i = 0; i < n; ++i) {
+      send_v[i] = v[(i + 1) * (m + 2) + 1];
+    }
+    MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE, args.left, 200, // dest, tag
+                         args.right, 200,                       // source, tag
+                         args.comm2d, &st);
+    // if (args.coords[0] != args.dims[0]-1) {
+    for (int i = 0; i < n; ++i) {
+      v[(i + 1) * (m + 2) + m + 1] = send_v[i];
+    }
+    //}
   }
   {
     // сверху вниз
@@ -236,25 +235,26 @@ void send_v_f(double *v, Args args) {
                              args.up, 300, // source, tag
                              args.comm2d, &st);
 
-    //if (rc != MPI_SUCCESS) {
-    //  char err_string[MPI_MAX_ERROR_STRING];
-    //  int err_length;
-    //  MPI_Error_string(rc, err_string, &err_length);
-    //  fprintf(stderr, "Процесс %d: Ошибка передачи/приема: %s\n", args.rank2d,
-    //          err_string);
-    //  MPI_Abort(MPI_COMM_WORLD, rc);
-    //} else {
-    //  // Можно проанализировать статус, например, узнать ранг отправителя
-    //  printf("Процесс %d: получил значение = %f от процесса %d (тег %d)\n",
-    //         args.rank2d, send_v[0], st.MPI_SOURCE, st.MPI_TAG);
-    //}
+    // if (rc != MPI_SUCCESS) {
+    //   char err_string[MPI_MAX_ERROR_STRING];
+    //   int err_length;
+    //   MPI_Error_string(rc, err_string, &err_length);
+    //   fprintf(stderr, "Процесс %d: Ошибка передачи/приема: %s\n",
+    //   args.rank2d,
+    //           err_string);
+    //   MPI_Abort(MPI_COMM_WORLD, rc);
+    // } else {
+    //   // Можно проанализировать статус, например, узнать ранг отправителя
+    //   printf("Процесс %d: получил значение = %f от процесса %d (тег %d)\n",
+    //          args.rank2d, send_v[0], st.MPI_SOURCE, st.MPI_TAG);
+    // }
 
-    //if (args.coords[1] != 0) {
-      for (int i = 0; i < m; ++i) {
-        v[(0) * (m + 2) + i + 1] = send_v[i];
-      }
+    // if (args.coords[1] != 0) {
+    for (int i = 0; i < m; ++i) {
+      v[(0) * (m + 2) + i + 1] = send_v[i];
+    }
     //}
-    //for (int r = 0; r < args.world_size; ++r) {
+    // for (int r = 0; r < args.world_size; ++r) {
     //  if (r == args.rank2d) {
     //    printf("[rank2d=%2d coords=(%d,%d) dims=(%d,%d)] "
     //           "L=%2d R=%2d U=%2d D=%2d\n",
@@ -279,10 +279,10 @@ void send_v_f(double *v, Args args) {
     MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE, args.up, 400, // dest, tag
                          args.down, 400,                      // source, tag
                          args.comm2d, &st);
-    //if (args.coords[1] != args.dims[1] - 1) {
-      for (int i = 0; i < m; ++i) {
-        v[(n + 1) * (m + 2) + i + 1] = send_v[i];
-      }
+    // if (args.coords[1] != args.dims[1] - 1) {
+    for (int i = 0; i < m; ++i) {
+      v[(n + 1) * (m + 2) + i + 1] = send_v[i];
+    }
     //}
   }
 }
@@ -414,13 +414,13 @@ int main(int argc, char *argv[]) {
   }
 
   // std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
-  fflush(stdout);
   for (int r = 0; r < args.world_size; ++r) {
     if (r == args.rank2d) {
-      printf("[rank2d=%2d coords=(%d,%d) dims=(%d,%d)] "
-             "L=%2d R=%2d U=%2d D=%2d\n",
-             args.rank2d, args.coords[0], args.coords[1], args.dims[0],
-             args.dims[1], args.left, args.right, args.up, args.down);
+      // printf("[rank2d=%2d coords=(%d,%d) dims=(%d,%d)] "
+      //        "L=%2d R=%2d U=%2d D=%2d\n",
+      //        args.rank2d, args.coords[0], args.coords[1], args.dims[0],
+      //        args.dims[1], args.left, args.right, args.up, args.down);
+      // fflush(stdout);
 
       // for (int j = 0; j < m+2; ++j) {
       //     for (int i = 0; i < n+2; ++i) {
@@ -434,7 +434,6 @@ int main(int argc, char *argv[]) {
       //// }
       // printf("\n\n");
       mat_print(w_k, args.M_field + 2, args.N_field + 2, args);
-      fflush(stdout);
     }
     MPI_Barrier(args.comm2d);
   }
