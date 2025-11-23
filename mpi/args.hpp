@@ -16,6 +16,7 @@ struct Args {
   double h2{0.0};
   double eps{0.0};
   int precision{5};
+
   int N_field{-1};
   int M_field{-1};
   int dims[2]{0, 0};
@@ -25,11 +26,13 @@ struct Args {
   int rank2d;
   int coords[2];
 
+  // соседи
   int left;
   int right;
   int up;
   int down;
 
+  // откуда начинается часть решетки для этого mpi процесса 
   double A1_field{-4.0};
   double A2_field{-1.0};
 };

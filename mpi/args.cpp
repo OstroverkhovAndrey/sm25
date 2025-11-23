@@ -50,6 +50,7 @@ Args parse_args(int argc, char *argv[]) {
   args.world_rank = world_rank;
   args.world_size = world_size;
 
+  // определяем размер решетки и размер задачи в каждом mpi процессе
   if (args.M == 4 && args.N == 6) {
     if (world_size == 2) {
       args.M_field = 4;
@@ -68,8 +69,22 @@ Args parse_args(int argc, char *argv[]) {
     } else {
       std::cout << "Error parse M N world_size" << std::endl;
     }
+  } else if (args.M == 40 && args.N == 40) {
+    if (world_size == 1) {
+      args.M_field = 40;
+      args.N_field = 40;
+      args.dims[0] = 1;
+      args.dims[1] = 1;
+    } else {
+      std::cout << "Error parse M N world_size" << std::endl;
+    }
   } else if (args.M == 40 && args.N == 60) {
-    if (world_size == 2) {
+    if (world_size == 1) {
+      args.M_field = 40;
+      args.N_field = 60;
+      args.dims[0] = 1;
+      args.dims[1] = 1;
+    } else if (world_size == 2) {
       args.M_field = 40;
       args.N_field = 30;
       args.dims[0] = 1;
@@ -134,50 +149,21 @@ Args parse_args(int argc, char *argv[]) {
     std::cout << "Error parse M N world_size" << std::endl;
   }
 
-  // Разложение по двум измерениям под размер world_size
-  // int dims[2] = {0, 0};                // 0 = подобрать автоматически
-  // MPI_Dims_create(world_size, 2, dims); // заполняет dims[],
-  // dims[0]*dims[1]==world_size
-
-  int periods[2] = {1, 1}; // тор (периодические границы)
+  int periods[2] = {1, 1}; // !!!
   int reorder = 1;
-  // MPI_Comm comm2d;
   MPI_Cart_create(MPI_COMM_WORLD, 2, args.dims, periods, reorder, &args.comm2d);
 
-  // if (comm2d == MPI_COMM_NULL) {       // на всякий случай
-  //     MPI_Finalize();
-  //     return 0;
-  // }
-
-  // int rank2d, coords[2];
   MPI_Comm_rank(args.comm2d, &args.rank2d);
   MPI_Cart_coords(args.comm2d, args.rank2d, 2, args.coords);
 
-  // int x = coords[0], y = coords[1];
-  // int n = 15, m = 10;
-  // int x0 = n*coords[0], y0 = m*coords[1];
-  //  std::vector<std::vector<double> > v(m+2, std::vector<double>(n+2, 0.0));
-  //  for (int j = 0; j < m; ++j) {
-  //      for (int i = 0; i < n; ++i) {
-  //          v[j+1][i+1] = dims[0]*n*(y0+j) + (x0 + i);
-  //      }
-  //  }
-
-  // Соседи по обоим измерениям
-  // int left, right, up, down;
   MPI_Cart_shift(args.comm2d, 0, 1, &args.left,
-                 &args.right); // dim=1: влево/вправо
-  MPI_Cart_shift(args.comm2d, 1, 1, &args.up, &args.down); // dim=0: вверх/вниз
+                 &args.right);
+  MPI_Cart_shift(args.comm2d, 1, 1, &args.up, &args.down);
 
   args.A1_field =
       ((args.B1 - args.A1) / args.dims[0]) * args.coords[0] + args.A1;
   args.A2_field =
       ((args.B2 - args.A2) / args.dims[1]) * args.coords[1] + args.A2;
 
-  // std::cout << std::fixed << std::setprecision(args.precision)
-  //           << "args: N == " << args.N << " M == " << args.M
-  //           << " count_iter == " << args.count_iter
-  //           << " delta == " << args.delta << " test == " << args.with_test
-  //           << std::endl;
   return args;
 }

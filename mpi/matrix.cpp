@@ -16,18 +16,13 @@
 double scalar_product(double *u, double *v, double h1, double h2, int M, int N,
                       Args args) {
   double ans = 0.0;
-  // int i, j;
-  // for (int k = 0; k < (M-2) * (N-2); ++k) {
-  //   i = k % M + 1;
-  //   j = k / M + 1;
-  //   ans += h1 * h2 * u[j * M + i] * v[j * M + i];
-  // }
-
-  for (int j = 1; j < N - 1; ++j) {
-    for (int i = 1; i < M - 1; ++i) {
-      ans += h1 * h2 * u[j * M + i] * v[j * M + i];
-    }
+  int i, j;
+  for (int k = 0; k < (M-2) * (N-2); ++k) {
+    i = k % (M - 2) + 1;
+    j = k / (M - 2) + 1;
+    ans += h1 * h2 * u[j * M + i] * v[j * M + i];
   }
+
   double global_ans = 0.0;
   MPI_Allreduce(&ans, &global_ans, 1, MPI_DOUBLE, MPI_SUM, args.comm2d);
   return global_ans;
@@ -104,11 +99,6 @@ void mat_mul_number(double *mat, double val, int M, int N) {
 // вывд матрицы в точностью 5 знаков после запятой
 void mat_print(double *mat, int M, int N, Args args) {
   std::ostringstream oss;
-
-  //oss << "[rank2d=" << args.rank2d << " coords=(" << args.coords[0] << ","
-  //    << args.coords[1] << ") dims=(" << args.dims[0] << ","
-  //    << args.dims[1] << ")] L=" << args.left << " R=" << args.right
-  //    << " U=" << args.up << " D=" << args.down << "\n";
   oss << "coords=(" << args.coords[0] << "," << args.coords[1] << ")\n";
 
   int i, j;
@@ -126,20 +116,12 @@ void mat_print(double *mat, int M, int N, Args args) {
     }
   }
   oss << "]\n\n";
-  // std::cout << oss.str() << std::flush;
-  // std::cout.flush();
-  std::string filename = std::to_string(args.rank2d) + ".txt";
 
-    // std::ofstream по умолчанию открывает файл на запись с очисткой (truncate)
+  std::string filename = "./txt/" + std::to_string(args.world_size) + "_" + std::to_string(args.rank2d) + ".txt";
     std::ofstream file(filename);
-
-    // Проверяем успешно ли открыт файл
     if (!file.is_open()) {
         std::cerr << "Ошибка: не удалось открыть файл " << filename << std::endl;
     }
-
-    // Записываем строки в файл
     file << oss.str();
-
     file.close();
 }
