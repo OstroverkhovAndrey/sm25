@@ -156,8 +156,7 @@ Args parse_args(int argc, char *argv[]) {
   MPI_Comm_rank(args.comm2d, &args.rank2d);
   MPI_Cart_coords(args.comm2d, args.rank2d, 2, args.coords);
 
-  MPI_Cart_shift(args.comm2d, 0, 1, &args.left,
-                 &args.right);
+  MPI_Cart_shift(args.comm2d, 0, 1, &args.left, &args.right);
   MPI_Cart_shift(args.comm2d, 1, 1, &args.up, &args.down);
 
   args.A1_field =

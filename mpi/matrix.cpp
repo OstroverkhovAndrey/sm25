@@ -1,5 +1,6 @@
 #include <matrix.hpp>
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <math.h>
@@ -8,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
-#include <fstream>
 
 #include <args.hpp>
 
@@ -17,7 +17,7 @@ double scalar_product(double *u, double *v, double h1, double h2, int M, int N,
                       Args args) {
   double ans = 0.0;
   int i, j;
-  for (int k = 0; k < (M-2) * (N-2); ++k) {
+  for (int k = 0; k < (M - 2) * (N - 2); ++k) {
     i = k % (M - 2) + 1;
     j = k / (M - 2) + 1;
     ans += h1 * h2 * u[j * M + i] * v[j * M + i];
@@ -117,11 +117,12 @@ void mat_print(double *mat, int M, int N, Args args) {
   }
   oss << "]\n\n";
 
-  std::string filename = "./txt/" + std::to_string(args.world_size) + "_" + std::to_string(args.rank2d) + ".txt";
-    std::ofstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Ошибка: не удалось открыть файл " << filename << std::endl;
-    }
-    file << oss.str();
-    file.close();
+  std::string filename = "./txt/" + std::to_string(args.world_size) + "_" +
+                         std::to_string(args.rank2d) + ".txt";
+  std::ofstream file(filename);
+  if (!file.is_open()) {
+    std::cerr << "Ошибка: не удалось открыть файл " << filename << std::endl;
+  }
+  file << oss.str();
+  file.close();
 }

@@ -15,21 +15,21 @@
 void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
   int i, j;
-   for (int k = 0; k < (N - 0) * (M - 0); ++k) {
-     i = (k % (M - 0)) + 1;
-     j = (k / (M - 0)) + 1;
-     double s1 = ((a[j * (M + 2) + (i + 1)] *
-                   (w[j * (M + 2) + (i + 1)] - w[j * (M + 2) + i]) / h1) -
-                  (a[j * (M + 2) + i] *
-                   (w[j * (M + 2) + i] - w[j * (M + 2) + (i - 1)]) / h1)) /
-                 h1;
-     double s2 = ((b[(j + 1) * (M + 2) + i] *
-                   (w[(j + 1) * (M + 2) + i] - w[j * (M + 2) + i]) / h2) -
-                  (b[j * (M + 2) + i] *
-                   (w[j * (M + 2) + i] - w[(j - 1) * (M + 2) + i]) / h2)) /
-                 h2;
-     ans[j * (M + 2) + i] = -s1 - s2;
-   }
+  for (int k = 0; k < (N - 0) * (M - 0); ++k) {
+    i = (k % (M - 0)) + 1;
+    j = (k / (M - 0)) + 1;
+    double s1 = ((a[j * (M + 2) + (i + 1)] *
+                  (w[j * (M + 2) + (i + 1)] - w[j * (M + 2) + i]) / h1) -
+                 (a[j * (M + 2) + i] *
+                  (w[j * (M + 2) + i] - w[j * (M + 2) + (i - 1)]) / h1)) /
+                h1;
+    double s2 = ((b[(j + 1) * (M + 2) + i] *
+                  (w[(j + 1) * (M + 2) + i] - w[j * (M + 2) + i]) / h2) -
+                 (b[j * (M + 2) + i] *
+                  (w[j * (M + 2) + i] - w[(j - 1) * (M + 2) + i]) / h2)) /
+                h2;
+    ans[j * (M + 2) + i] = -s1 - s2;
+  }
   return;
 }
 
@@ -51,8 +51,7 @@ void D_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
   for (int k = 0; k < (N - 0) * (M - 0); ++k) {
     i = (k % (M - 0)) + 1;
     j = (k / (M - 0)) + 1;
-    double d = ((a[j * (M + 2) + (i + 1)] + a[j * (M + 2) + i]) / (h1 * h1))
-    +
+    double d = ((a[j * (M + 2) + (i + 1)] + a[j * (M + 2) + i]) / (h1 * h1)) +
                ((b[(j + 1) * (M + 2) + i] + b[j * (M + 2) + i]) / (h2 * h2));
     ans[j * (M + 2) + i] = w[j * (M + 2) + i] / d;
   }
@@ -153,13 +152,12 @@ void send_border(double *v, Args args) {
     for (int i = 0; i < n; ++i) {
       send_v[i] = v[(i + 1) * (m + 2) + m];
     }
-    MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE, args.right, 100,
-                         args.left, 100,
+    MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE, args.right, 100, args.left, 100,
                          args.comm2d, &st);
     if (args.coords[0] != 0) {
-    for (int i = 0; i < n; ++i) {
-      v[(i + 1) * (m + 2) + 0] = send_v[i];
-    }
+      for (int i = 0; i < n; ++i) {
+        v[(i + 1) * (m + 2) + 0] = send_v[i];
+      }
     }
   }
   {
@@ -168,13 +166,12 @@ void send_border(double *v, Args args) {
     for (int i = 0; i < n; ++i) {
       send_v[i] = v[(i + 1) * (m + 2) + 1];
     }
-    MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE, args.left, 200,
-                         args.right, 200,
+    MPI_Sendrecv_replace(send_v, n, MPI_DOUBLE, args.left, 200, args.right, 200,
                          args.comm2d, &st);
-    if (args.coords[0] != args.dims[0]-1) {
-    for (int i = 0; i < n; ++i) {
-      v[(i + 1) * (m + 2) + m + 1] = send_v[i];
-    }
+    if (args.coords[0] != args.dims[0] - 1) {
+      for (int i = 0; i < n; ++i) {
+        v[(i + 1) * (m + 2) + m + 1] = send_v[i];
+      }
     }
   }
   {
@@ -183,10 +180,8 @@ void send_border(double *v, Args args) {
     for (int i = 0; i < m; ++i) {
       send_v[i] = v[(n) * (m + 2) + i + 1];
     }
-    int rc =
-        MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE, args.down, 300,
-                             args.up, 300,
-                             args.comm2d, &st);
+    int rc = MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE, args.down, 300,
+                                  args.up, 300, args.comm2d, &st);
 
     if (args.coords[1] != 0) {
       for (int i = 0; i < m; ++i) {
@@ -200,13 +195,12 @@ void send_border(double *v, Args args) {
     for (int i = 0; i < m; ++i) {
       send_v[i] = v[(1) * (m + 2) + i + 1];
     }
-    MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE, args.up, 400,
-                         args.down, 400,
+    MPI_Sendrecv_replace(send_v, m, MPI_DOUBLE, args.up, 400, args.down, 400,
                          args.comm2d, &st);
     if (args.coords[1] != args.dims[1] - 1) {
-    for (int i = 0; i < m; ++i) {
-      v[(n + 1) * (m + 2) + i + 1] = send_v[i];
-    }
+      for (int i = 0; i < m; ++i) {
+        v[(n + 1) * (m + 2) + i + 1] = send_v[i];
+      }
     }
   }
 }
@@ -365,7 +359,8 @@ int main(int argc, char *argv[]) {
   double local_time = end_time - start_time, max_time;
   MPI_Reduce(&local_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
   if (args.rank2d == 0) {
-      std::cout << "Максимальное время среди процессов: " << max_time << " секунд\n";
+    std::cout << "Максимальное время среди процессов: " << max_time
+              << " секунд\n";
   }
   MPI_Comm_free(&args.comm2d);
   MPI_Finalize();
