@@ -124,21 +124,21 @@ Args parse_args(int argc, char *argv[]) {
   } else if (args.M == 800 && args.N == 1200) {
     if (world_size == 4) {
       args.M_field = 400;
-      args.N_field = 300;
+      args.N_field = 600;
       args.dims[0] = 2;
       args.dims[1] = 2;
     } else if (world_size == 8) {
-      args.M_field = 200;
+      args.M_field = 400;
       args.N_field = 300;
       args.dims[0] = 2;
       args.dims[1] = 4;
     } else if (world_size == 16) {
       args.M_field = 200;
-      args.N_field = 150;
+      args.N_field = 300;
       args.dims[0] = 4;
       args.dims[1] = 4;
     } else if (world_size == 32) {
-      args.M_field = 100;
+      args.M_field = 200;
       args.N_field = 150;
       args.dims[0] = 4;
       args.dims[1] = 8;
