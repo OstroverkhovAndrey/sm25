@@ -149,7 +149,7 @@ Args parse_args(int argc, char *argv[]) {
     std::cout << "Error parse M N world_size" << std::endl;
   }
 
-  int periods[2] = {1, 1}; // !!!
+  int periods[2] = {0, 0};
   int reorder = 1;
   MPI_Cart_create(MPI_COMM_WORLD, 2, args.dims, periods, reorder, &args.comm2d);
 
