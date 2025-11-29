@@ -11,9 +11,9 @@ double scalar_product(double *u, double *v, double h1, double h2, int M,
                       int N) {
   double ans = 0.0;
   int i, j;
-  for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
+  for (int k = 0; k < (M - 2) * (N - 2); ++k) {
+    i = k % (M - 2) + 1;
+    j = k / (M - 2) + 1;
     ans += h1 * h2 * u[j * M + i] * v[j * M + i];
   }
   return ans;
