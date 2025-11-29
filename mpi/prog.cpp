@@ -237,9 +237,6 @@ int main(int argc, char *argv[]) {
   double *w_k_plus1 = mat_create(args.M_field + 2, args.N_field + 2);
 
   double *temp1 = mat_create(args.M_field + 2, args.N_field + 2);
-  double *temp2 = mat_create(args.M_field + 2, args.N_field + 2);
-  double *temp3 = mat_create(args.M_field + 2, args.N_field + 2);
-  double *temp4 = mat_create(args.M_field + 2, args.N_field + 2);
 
   double *z_k_0 = mat_create(args.M_field + 2, args.N_field + 2);
   double *p_k_1 = mat_create(args.M_field + 2, args.N_field + 2);
@@ -252,8 +249,7 @@ int main(int argc, char *argv[]) {
     // std::cout << "Zero iteration\n\n";
     // r_k_0 = B - A w_k
     A_fun(a, b, w_k, args.M_field, args.N_field, h1, h2, temp1);
-    B_fun(F, args.M_field, args.N_field, temp2);
-    mat_minus(temp2, temp1, args.M_field + 2, args.N_field + 2, r_k_0);
+    mat_minus(F, temp1, args.M_field + 2, args.N_field + 2, r_k_0);
 
     // z_k = r_k / D;
     D_fun(a, b, r_k_0, args.M_field, args.N_field, h1, h2, z_k_0);
@@ -263,16 +259,16 @@ int main(int argc, char *argv[]) {
 
     // alpha_k == (z_0, k_0) / (Ap_1, p_1)
     send_border(p_k_1, args);
-    A_fun(a, b, p_k_1, args.M_field, args.N_field, h1, h2, temp3);
+    A_fun(a, b, p_k_1, args.M_field, args.N_field, h1, h2, temp1);
     alpha_k = scalar_product(z_k_0, r_k_0, h1, h2, args.M_field + 2,
                              args.N_field + 2, args) /
-              scalar_product(temp3, p_k_1, h1, h2, args.M_field + 2,
+              scalar_product(temp1, p_k_1, h1, h2, args.M_field + 2,
                              args.N_field + 2, args);
 
     // w_1 == w_0 + alpha_k * p_1
-    mat_copy(p_k_1, args.M_field + 2, args.N_field + 2, temp4);
-    mat_mul_number(temp4, alpha_k, args.M_field + 2, args.N_field + 2);
-    mat_plus(w_k, temp4, args.M_field + 2, args.N_field + 2, w_k_plus1);
+    mat_copy(p_k_1, args.M_field + 2, args.N_field + 2, temp1);
+    mat_mul_number(temp1, alpha_k, args.M_field + 2, args.N_field + 2);
+    mat_plus(w_k, temp1, args.M_field + 2, args.N_field + 2, w_k_plus1);
 
     // w_0 = w_1, для зацикливания
     mat_copy(w_k_plus1, args.M_field + 2, args.N_field + 2, w_k);
@@ -292,7 +288,7 @@ int main(int argc, char *argv[]) {
     // z_k = r_k / D;
     D_fun(a, b, r_k_1, M, N, h1, h2, z_k_1);
 
-    // betta == (z_k_1, r_k_1) / (z_k_0, z_k_0)
+    // betta == (z_k_1, r_k_1) / (z_k_0, r_k_0)
     double betta = scalar_product(z_k_1, r_k_1, h1, h2, M + 2, N + 2, args) /
                    scalar_product(z_k_0, r_k_0, h1, h2, M + 2, N + 2, args);
 
@@ -303,20 +299,18 @@ int main(int argc, char *argv[]) {
 
     // alpha_k == (z_0, k_0) / (Ap_1, p_1)
     send_border(p_k_2, args);
-    A_fun(a, b, p_k_2, M, N, h1, h2, temp2);
+    A_fun(a, b, p_k_2, M, N, h1, h2, temp1);
     alpha_k = scalar_product(z_k_1, r_k_1, h1, h2, M + 2, N + 2, args) /
-              scalar_product(temp2, p_k_2, h1, h2, M + 2, N + 2, args);
+              scalar_product(temp1, p_k_2, h1, h2, M + 2, N + 2, args);
 
     // w_1 == w_0 + alpha_k * p_k_2
-    mat_copy(p_k_2, M + 2, N + 2, temp3);
-    mat_mul_number(temp3, alpha_k, M + 2, N + 2);
-    mat_plus(w_k, temp3, M + 2, N + 2, w_k_plus1);
+    mat_copy(p_k_2, M + 2, N + 2, temp1);
+    mat_mul_number(temp1, alpha_k, M + 2, N + 2);
+    mat_plus(w_k, temp1, M + 2, N + 2, w_k_plus1);
 
     // считаем ошибку
-    mat_copy(w_k, M + 2, N + 2, temp1);
-    mat_copy(w_k_plus1, M + 2, N + 2, temp2);
-    mat_minus(temp2, temp1, M + 2, N + 2, temp3);
-    err = norm(temp3, h1, h2, M + 2, N + 2, args);
+    mat_minus(w_k_plus1, w_k, M + 2, N + 2, temp1);
+    err = norm(temp1, h1, h2, M + 2, N + 2, args);
 
     if (args.rank2d == 0) {
       std::cout << std::fixed << std::setprecision(args.precision)
@@ -333,7 +327,7 @@ int main(int argc, char *argv[]) {
   if (args.rank2d == 0) {
     std::cout << "\nCount iteration: " << i << "\n";
   }
-  mat_print(w_k, args.M_field + 2, args.N_field + 2, args);
+  //mat_print(w_k, args.M_field + 2, args.N_field + 2, args);
 
   // очищаем память
   mat_free(a, args.M_field + 2, args.N_field + 2);
@@ -341,9 +335,6 @@ int main(int argc, char *argv[]) {
   mat_free(F, args.M_field + 2, args.N_field + 2);
 
   mat_free(temp1, args.M_field + 2, args.N_field + 2);
-  mat_free(temp2, args.M_field + 2, args.N_field + 2);
-  mat_free(temp3, args.M_field + 2, args.N_field + 2);
-  mat_free(temp4, args.M_field + 2, args.N_field + 2);
 
   mat_free(w_k, args.M_field + 2, args.N_field + 2);
   mat_free(w_k_plus1, args.M_field + 2, args.N_field + 2);
