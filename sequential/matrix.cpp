@@ -13,8 +13,8 @@
 double scalar_product(double *u, double *v, double h1, double h2, int M,
                       int N) {
   double ans = 0.0;
-  for (int j = 1; j < N; ++j) {
-    for (int i = 1; i < M; ++i) {
+  for (int j = 1; j < N - 1; ++j) {
+    for (int i = 1; i < M - 1; ++i) {
     ans += h1 * h2 * u[j * M + i] * v[j * M + i];
     }
   }
@@ -34,6 +34,13 @@ void mat_copy(double *src, int M, int N, double *target) {
     j = k / M;
     target[j * M + i] = src[j * M + i];
   }
+}
+
+// обмен матриц указателями
+void mat_swap(double **src, int M, int N, double **target) {
+  double* tmp = *src;
+  *src = *target;
+  *target = tmp;
 }
 
 // установка во все значения матрицы значения val

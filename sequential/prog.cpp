@@ -10,6 +10,75 @@
 #include <matrix.hpp>
 #include <variant.hpp>
 
+// считаем r_k_0
+//void calc_r_k_0(double *a, double *b, double *F, double *w, int M, int N, double h1, double h2,
+//           double *r_k_0) {
+//
+//  for (int j = 1; j < N; ++j) {
+//    for (int i = 1; i < M; ++i) {
+//
+//    double s1 = ((a[j * (M + 1) + (i + 1)] *
+//                  (w[j * (M + 1) + (i + 1)] - w[j * (M + 1) + i]) / h1) -
+//                 (a[j * (M + 1) + i] *
+//                  (w[j * (M + 1) + i] - w[j * (M + 1) + (i - 1)]) / h1)) /
+//                h1;
+//    double s2 = ((b[(j + 1) * (M + 1) + i] *
+//                  (w[(j + 1) * (M + 1) + i] - w[j * (M + 1) + i]) / h2) -
+//                 (b[j * (M + 1) + i] *
+//                  (w[j * (M + 1) + i] - w[(j - 1) * (M + 1) + i]) / h2)) /
+//                h2;
+//    r_k_0[j * (M + 1) + i] = F[j * (M + 1) + i] - (-s1 - s2);
+//    }
+//  }
+//  return;
+//}
+
+// считаем z_k_0 p_k_1
+//void calc_z_k_0__p_k_1(double *a, double *b, double *r_k_0, int M, int N, double h1, double h2, double *z_k_0, double *p_k_1) {
+//  for (int j = 1; j < N; ++j) {
+//    for (int i = 1; i < M; ++i) {
+//    double d = ((a[j * (M + 1) + (i + 1)] + a[j * (M + 1) + i]) / (h1 * h1)) +
+//               ((b[(j + 1) * (M + 1) + i] + b[j * (M + 1) + i]) / (h2 * h2));
+//    z_k_0[j * (M + 1) + i] = r_k_0[j * (M + 1) + i] / d;
+//    p_k_1[j * (M + 1) + i] = r_k_0[j * (M + 1) + i] / d;
+//    }
+//  }
+//  return;
+//}
+
+// считаем z_k_0 p_k_1
+//void calc_w_k_p1(double *w_k, double alpha_k, double *p_k_1, int M, int N, double h1, double h2, double *w_k_plus1) {
+//  for (int j = 1; j < N; ++j) {
+//    for (int i = 1; i < M; ++i) {
+//      w_k_plus1[j * (M + 1) + i] = w_k[j * (M + 1) + i] + alpha_k * p_k_1[j * (M + 1) + i];
+//    }
+//  }
+//  return;
+//}
+
+// считаем r_k_1
+//void calc_r_k_1(double *a, double *b, double *F, double *r_k_0, double alpha_k, double *p_k_1, int M, int N, double h1, double h2,
+//           double *r_k_1) {
+//
+//  for (int j = 1; j < N; ++j) {
+//    for (int i = 1; i < M; ++i) {
+//
+//    double s1 = ((a[j * (M + 1) + (i + 1)] *
+//                  (p_k_1[j * (M + 1) + (i + 1)] - p_k_1[j * (M + 1) + i]) / h1) -
+//                 (a[j * (M + 1) + i] *
+//                  (p_k_1[j * (M + 1) + i] - p_k_1[j * (M + 1) + (i - 1)]) / h1)) /
+//                h1;
+//    double s2 = ((b[(j + 1) * (M + 1) + i] *
+//                  (p_k_1[(j + 1) * (M + 1) + i] - p_k_1[j * (M + 1) + i]) / h2) -
+//                 (b[j * (M + 1) + i] *
+//                  (p_k_1[j * (M + 1) + i] - p_k_1[(j - 1) * (M + 1) + i]) / h2)) /
+//                h2;
+//    r_k_1[j * (M + 1) + i] = r_k_0[j * (M + 1) + i] - alpha_k * (-s1 - s2);
+//    }
+//  }
+//  return;
+//}
+
 // оператор A
 void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
@@ -79,8 +148,10 @@ double calc_F_ij(double h1, double h2, Point p) {
 // инициализируем и заполняем матрицу a
 double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
   double *a = mat_create(M+1, N+1);
-  for (int j = 1; j < N+1; ++j) {
-    for (int i = 1; i < M+1; ++i) {
+  // тут считаем от нуля, чтобы корректно считалось в mpi версии
+  // на последовательный и OpenMP код это не влияет
+  for (int j = 0; j < N+1; ++j) {
+    for (int i = 0; i < M+1; ++i) {
     Point p1;
     p1.x = i * h1 - 0.5 * h1 + args.A1, p1.y = j * h2 - 0.5 * h2 + args.A2;
     Point p2;
@@ -94,8 +165,10 @@ double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
 // инициализируем и заполняем матрицу b
 double *init_b(int M, int N, double h1, double h2, double eps, Args args) {
   double *b = mat_create(M + 1, N + 1);
-  for (int j = 1; j < N+1; ++j) {
-    for (int i = 1; i < M+1; ++i) {
+  // тут считаем от нуля, чтобы корректно считалось в mpi версии
+  // на последовательный и OpenMP код это не влияет
+  for (int j = 0; j < N+1; ++j) {
+    for (int i = 0; i < M+1; ++i) {
     Point p1;
     p1.x = i * h1 - 0.5 * h1 + args.A1, p1.y = j * h2 - 0.5 * h2 + args.A2;
     Point p2;
@@ -160,9 +233,6 @@ int main(int argc, char *argv[]) {
   double *w_k_plus1 = mat_create(M + 1, N + 1);
 
   double *temp1 = mat_create(M + 1, N + 1);
-  double *temp2 = mat_create(M + 1, N + 1);
-  double *temp3 = mat_create(M + 1, N + 1);
-  double *temp4 = mat_create(M + 1, N + 1);
 
   double *z_k_0 = mat_create(M + 1, N + 1);
   double *p_k_1 = mat_create(M + 1, N + 1);
@@ -175,27 +245,25 @@ int main(int argc, char *argv[]) {
     std::cout << "Zero iteration\n\n";
     // r_k_0 = B - A w_k
     A_fun(a, b, w_k, M, N, h1, h2, temp1);
-    B_fun(F, M, N, temp2);
-    mat_minus(temp2, temp1, M + 1, N + 1, r_k_0);
+    mat_minus(F, temp1, M + 1, N + 1, r_k_0);
 
     // z_k = r_k / D;
     D_fun(a, b, r_k_0, M, N, h1, h2, z_k_0);
-
     // p_k_1 = z_k_0;
     mat_copy(z_k_0, M + 1, N + 1, p_k_1);
 
     // alpha_k == (z_0, k_0) / (Ap_1, p_1)
-    A_fun(a, b, p_k_1, M, N, h1, h2, temp3);
+    A_fun(a, b, p_k_1, M, N, h1, h2, temp1);
     alpha_k = scalar_product(z_k_0, r_k_0, h1, h2, M + 1, N + 1) /
-              scalar_product(temp3, p_k_1, h1, h2, M + 1, N + 1);
+              scalar_product(temp1, p_k_1, h1, h2, M + 1, N + 1);
 
     // w_1 == w_0 + alpha_k * p_1
-    mat_copy(p_k_1, M + 1, N + 1, temp4);
-    mat_mul_number(temp4, alpha_k, M + 1, N + 1);
-    mat_plus(w_k, temp4, M + 1, N + 1, w_k_plus1);
+    mat_copy(p_k_1, M + 1, N + 1, temp1);
+    mat_mul_number(temp1, alpha_k, M + 1, N + 1);
+    mat_plus(w_k, temp1, M + 1, N + 1, w_k_plus1);
 
     // w_0 = w_1, для зацикливания
-    mat_copy(w_k_plus1, M + 1, N + 1, w_k);
+    mat_swap(&w_k_plus1, M + 1, N + 1, &w_k);
   }
   std::cout << "Start iteration\n\n";
 
@@ -221,28 +289,26 @@ int main(int argc, char *argv[]) {
     mat_plus(z_k_1, p_k_1, M + 1, N + 1, p_k_2);
 
     // alpha_k == (z_0, k_0) / (Ap_1, p_1)
-    A_fun(a, b, p_k_2, M, N, h1, h2, temp2);
+    A_fun(a, b, p_k_2, M, N, h1, h2, temp1);
     alpha_k = scalar_product(z_k_1, r_k_1, h1, h2, M + 1, N + 1) /
-              scalar_product(temp2, p_k_2, h1, h2, M + 1, N + 1);
+              scalar_product(temp1, p_k_2, h1, h2, M + 1, N + 1);
 
     // w_1 == w_0 + alpha_k * p_k_2
-    mat_copy(p_k_2, M + 1, N + 1, temp3);
-    mat_mul_number(temp3, alpha_k, M + 1, N + 1);
-    mat_plus(w_k, temp3, M + 1, N + 1, w_k_plus1);
+    mat_copy(p_k_2, M + 1, N + 1, temp1);
+    mat_mul_number(temp1, alpha_k, M + 1, N + 1);
+    mat_plus(w_k, temp1, M + 1, N + 1, w_k_plus1);
 
     // считаем ошибку
-    mat_copy(w_k, M + 1, N + 1, temp1);
-    mat_copy(w_k_plus1, M + 1, N + 1, temp2);
-    mat_minus(temp2, temp1, M + 1, N + 1, temp3);
-    err = norm(temp3, h1, h2, M + 1, N + 1);
+    mat_minus(w_k_plus1, w_k, M + 1, N + 1, temp1);
+    err = norm(temp1, h1, h2, M + 1, N + 1);
     std::cout << std::fixed << std::setprecision(args.precision)
               << "error: " << err << std::endl;
 
     // копируем значения для зацикливания
-    mat_copy(w_k_plus1, M + 1, N + 1, w_k);
-    mat_copy(z_k_1, M + 1, N + 1, z_k_0);
-    mat_copy(p_k_2, M + 1, N + 1, p_k_1);
-    mat_copy(r_k_1, M + 1, N + 1, r_k_0);
+    mat_swap(&w_k_plus1, M + 1, N + 1, &w_k);
+    mat_swap(&z_k_1, M + 1, N + 1, &z_k_0);
+    mat_swap(&p_k_2, M + 1, N + 1, &p_k_1);
+    mat_swap(&r_k_1, M + 1, N + 1, &r_k_0);
   }
 
   std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
@@ -254,12 +320,10 @@ int main(int argc, char *argv[]) {
   mat_free(F, M + 1, N + 1);
 
   mat_free(temp1, M + 1, N + 1);
-  mat_free(temp2, M + 1, N + 1);
-  mat_free(temp3, M + 1, N + 1);
-  mat_free(temp4, M + 1, N + 1);
 
   mat_free(w_k, M + 1, N + 1);
   mat_free(w_k_plus1, M + 1, N + 1);
+
   mat_free(z_k_0, M + 1, N + 1);
   mat_free(p_k_1, M + 1, N + 1);
   mat_free(r_k_0, M + 1, N + 1);

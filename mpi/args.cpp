@@ -10,6 +10,27 @@ double square_of_max(double a, double b) {
   return m * m;
 }
 
+int from_power_two(int x) {
+  int ans = 0;
+  while (x % 2 == 0) {
+    ans++;
+    x /= 2;
+  }
+  if (x != 1) {
+    std::cout << "Error MPI size not power two!" << std::endl;
+    return 1;
+  }
+  return ans;
+}
+
+int to_power_two(int x) {
+  int ans = 1;
+  for (int i = 0; i < x; ++i) {
+    ans *= 2;
+  }
+  return ans;
+}
+
 Args parse_args(int argc, char *argv[]) {
   Args args;
   for (int i = 1; i < argc; ++i) {
@@ -51,103 +72,28 @@ Args parse_args(int argc, char *argv[]) {
   args.world_size = world_size;
 
   // определяем размер решетки и размер задачи в каждом mpi процессе
-  if (args.M == 4 && args.N == 6) {
-    if (world_size == 2) {
-      args.M_field = 4;
-      args.N_field = 3;
-      args.dims[0] = 1;
-      args.dims[1] = 2;
-    } else {
-      std::cout << "Error parse M N world_size" << std::endl;
-    }
-  } else if (args.M == 8 && args.N == 12) {
-    if (world_size == 2) {
-      args.M_field = 8;
-      args.N_field = 6;
-      args.dims[0] = 1;
-      args.dims[1] = 2;
-    } else {
-      std::cout << "Error parse M N world_size" << std::endl;
-    }
-  } else if (args.M == 40 && args.N == 40) {
-    if (world_size == 1) {
-      args.M_field = 40;
-      args.N_field = 40;
-      args.dims[0] = 1;
-      args.dims[1] = 1;
-    } else {
-      std::cout << "Error parse M N world_size" << std::endl;
-    }
-  } else if (args.M == 40 && args.N == 60) {
-    if (world_size == 1) {
-      args.M_field = 40;
-      args.N_field = 60;
-      args.dims[0] = 1;
-      args.dims[1] = 1;
-    } else if (world_size == 2) {
-      args.M_field = 40;
-      args.N_field = 30;
-      args.dims[0] = 1;
-      args.dims[1] = 2;
-    } else if (world_size == 4) {
-      args.M_field = 20;
-      args.N_field = 30;
-      args.dims[0] = 2;
-      args.dims[1] = 2;
-    } else {
-      std::cout << "Error parse M N world_size" << std::endl;
-    }
-  } else if (args.M == 400 && args.N == 600) {
-    if (world_size == 2) {
-      args.M_field = 400;
-      args.N_field = 300;
-      args.dims[0] = 1;
-      args.dims[1] = 2;
-    } else if (world_size == 4) {
-      args.M_field = 200;
-      args.N_field = 300;
-      args.dims[0] = 2;
-      args.dims[1] = 2;
-    } else if (world_size == 8) {
-      args.M_field = 200;
-      args.N_field = 150;
-      args.dims[0] = 2;
-      args.dims[1] = 4;
-    } else if (world_size == 16) {
-      args.M_field = 100;
-      args.N_field = 150;
-      args.dims[0] = 4;
-      args.dims[1] = 4;
-    } else {
-      std::cout << "Error parse M N world_size" << std::endl;
-    }
-  } else if (args.M == 800 && args.N == 1200) {
-    if (world_size == 4) {
-      args.M_field = 400;
-      args.N_field = 600;
-      args.dims[0] = 2;
-      args.dims[1] = 2;
-    } else if (world_size == 8) {
-      args.M_field = 400;
-      args.N_field = 300;
-      args.dims[0] = 2;
-      args.dims[1] = 4;
-    } else if (world_size == 16) {
-      args.M_field = 200;
-      args.N_field = 300;
-      args.dims[0] = 4;
-      args.dims[1] = 4;
-    } else if (world_size == 32) {
-      args.M_field = 200;
-      args.N_field = 150;
-      args.dims[0] = 4;
-      args.dims[1] = 8;
-    } else {
-      std::cout << "Error parse M N world_size" << std::endl;
-    }
-  } else {
-    std::cout << "Error parse M N world_size" << std::endl;
+  if (args.M < 10 || args.N < 10) {
+    std::cout << "Error too small M or N" << std::endl;
   }
+  args.N -= 1;
+  args.M -= 1;
+
+  int k = from_power_two(world_size);
+  int k_m = 0, k_n = 0;
+  double M_temp = args.M, N_temp = args.N;
+  while (k > 0) {
+    if (M_temp > N_temp) {
+      M_temp /= 2.0;
+      k_m++;
+    } else {
+      N_temp /= 2.0;
+      k_n++;
+    }
+    k--;
+  }
+  // отсчет идет от 1
+  args.dims[0] = k_m + 1;
+  args.dims[1] = k_n + 1;
 
   int periods[2] = {0, 0};
   int reorder = 1;
@@ -159,10 +105,31 @@ Args parse_args(int argc, char *argv[]) {
   MPI_Cart_shift(args.comm2d, 0, 1, &args.left, &args.right);
   MPI_Cart_shift(args.comm2d, 1, 1, &args.up, &args.down);
 
+  args.M_field = (int)(args.M / to_power_two(k_m));
+  args.N_field = (int)(args.N / to_power_two(k_n));
+
+  int prev_cell_m = args.M_field * args.coords[0];
+  int prev_cell_n = args.N_field * args.coords[1];
+
+  if (args.M % to_power_two(k_m) > args.coords[0]) {
+    args.M_field += 1;
+    prev_cell_m += args.coords[0];
+  } else {
+    prev_cell_m += args.M % to_power_two(k_m);
+  }
+  if (args.N % to_power_two(k_n) > args.coords[1]) {
+    args.N_field += 1;
+    prev_cell_n += args.coords[1];
+  } else {
+    prev_cell_n += args.N % to_power_two(k_n);
+  }
+  // !!!
   args.A1_field =
-      ((args.B1 - args.A1) / args.dims[0]) * args.coords[0] + args.A1;
+      args.h1 * prev_cell_m + args.A1;
   args.A2_field =
-      ((args.B2 - args.A2) / args.dims[1]) * args.coords[1] + args.A2;
+      args.h2 * prev_cell_n + args.A2;
+
+  std::cout << "coords: " << args.coords[0] << " " << args.coords[1] << " field: " << args.M_field << " " << args.N_field << std::endl;
 
   return args;
 }
