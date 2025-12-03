@@ -98,8 +98,10 @@ void mat_mul_number(double *mat, double val, int M, int N) {
 
 // вывд матрицы в точностью 5 знаков после запятой
 void mat_print(double *mat, int M, int N, Args args) {
+  std::string legend = "M_" + std::to_string(args.M) + "__N_" + std::to_string(args.N);
   std::ostringstream oss;
   int i, j;
+  oss << legend << std::endl;
   oss << "[";
   for (int k = 0; k < M * N; ++k) {
     i = k % M;
@@ -115,7 +117,7 @@ void mat_print(double *mat, int M, int N, Args args) {
   }
   oss << "]\n\n";
 
-  std::string filename = "./txt/w.txt";
+  std::string filename = "./txt/" + legend + ".txt";
   std::ofstream file(filename);
   if (!file.is_open()) {
     std::cerr << "Ошибка: не удалось открыть файл " << filename << std::endl;
