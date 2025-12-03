@@ -10,75 +10,6 @@
 #include <matrix.hpp>
 #include <variant.hpp>
 
-// считаем r_k_0
-//void calc_r_k_0(double *a, double *b, double *F, double *w, int M, int N, double h1, double h2,
-//           double *r_k_0) {
-//
-//  for (int j = 1; j < N; ++j) {
-//    for (int i = 1; i < M; ++i) {
-//
-//    double s1 = ((a[j * (M + 1) + (i + 1)] *
-//                  (w[j * (M + 1) + (i + 1)] - w[j * (M + 1) + i]) / h1) -
-//                 (a[j * (M + 1) + i] *
-//                  (w[j * (M + 1) + i] - w[j * (M + 1) + (i - 1)]) / h1)) /
-//                h1;
-//    double s2 = ((b[(j + 1) * (M + 1) + i] *
-//                  (w[(j + 1) * (M + 1) + i] - w[j * (M + 1) + i]) / h2) -
-//                 (b[j * (M + 1) + i] *
-//                  (w[j * (M + 1) + i] - w[(j - 1) * (M + 1) + i]) / h2)) /
-//                h2;
-//    r_k_0[j * (M + 1) + i] = F[j * (M + 1) + i] - (-s1 - s2);
-//    }
-//  }
-//  return;
-//}
-
-// считаем z_k_0 p_k_1
-//void calc_z_k_0__p_k_1(double *a, double *b, double *r_k_0, int M, int N, double h1, double h2, double *z_k_0, double *p_k_1) {
-//  for (int j = 1; j < N; ++j) {
-//    for (int i = 1; i < M; ++i) {
-//    double d = ((a[j * (M + 1) + (i + 1)] + a[j * (M + 1) + i]) / (h1 * h1)) +
-//               ((b[(j + 1) * (M + 1) + i] + b[j * (M + 1) + i]) / (h2 * h2));
-//    z_k_0[j * (M + 1) + i] = r_k_0[j * (M + 1) + i] / d;
-//    p_k_1[j * (M + 1) + i] = r_k_0[j * (M + 1) + i] / d;
-//    }
-//  }
-//  return;
-//}
-
-// считаем z_k_0 p_k_1
-//void calc_w_k_p1(double *w_k, double alpha_k, double *p_k_1, int M, int N, double h1, double h2, double *w_k_plus1) {
-//  for (int j = 1; j < N; ++j) {
-//    for (int i = 1; i < M; ++i) {
-//      w_k_plus1[j * (M + 1) + i] = w_k[j * (M + 1) + i] + alpha_k * p_k_1[j * (M + 1) + i];
-//    }
-//  }
-//  return;
-//}
-
-// считаем r_k_1
-//void calc_r_k_1(double *a, double *b, double *F, double *r_k_0, double alpha_k, double *p_k_1, int M, int N, double h1, double h2,
-//           double *r_k_1) {
-//
-//  for (int j = 1; j < N; ++j) {
-//    for (int i = 1; i < M; ++i) {
-//
-//    double s1 = ((a[j * (M + 1) + (i + 1)] *
-//                  (p_k_1[j * (M + 1) + (i + 1)] - p_k_1[j * (M + 1) + i]) / h1) -
-//                 (a[j * (M + 1) + i] *
-//                  (p_k_1[j * (M + 1) + i] - p_k_1[j * (M + 1) + (i - 1)]) / h1)) /
-//                h1;
-//    double s2 = ((b[(j + 1) * (M + 1) + i] *
-//                  (p_k_1[(j + 1) * (M + 1) + i] - p_k_1[j * (M + 1) + i]) / h2) -
-//                 (b[j * (M + 1) + i] *
-//                  (p_k_1[j * (M + 1) + i] - p_k_1[(j - 1) * (M + 1) + i]) / h2)) /
-//                h2;
-//    r_k_1[j * (M + 1) + i] = r_k_0[j * (M + 1) + i] - alpha_k * (-s1 - s2);
-//    }
-//  }
-//  return;
-//}
-
 // оператор A
 void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
@@ -96,16 +27,6 @@ void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
                   (w[j * (M + 1) + i] - w[(j - 1) * (M + 1) + i]) / h2)) /
                 h2;
     ans[j * (M + 1) + i] = -s1 - s2;
-    }
-  }
-  return;
-}
-
-// оператор B
-void B_fun(double *F, int M, int N, double *ans) {
-  for (int j = 1; j < N; ++j) {
-    for (int i = 1; i < M; ++i) {
-      ans[j * (M + 1) + i] = F[j * (M + 1) + i];
     }
   }
   return;
@@ -265,10 +186,10 @@ int main(int argc, char *argv[]) {
     // w_0 = w_1, для зацикливания
     mat_swap(&w_k_plus1, M + 1, N + 1, &w_k);
   }
-  std::cout << "Start iteration\n\n";
 
   int i = 0;
   double err = args.delta + 1;
+  std::cout << "Start iteration\n\n";
   for (; stop_iter(i, err, args); ++i) {
 
     // r_k_1 == r_k_0 - alpha_k A p_k_1
@@ -304,14 +225,14 @@ int main(int argc, char *argv[]) {
     std::cout << std::fixed << std::setprecision(args.precision)
               << "error: " << err << std::endl;
 
-    // копируем значения для зацикливания
+    // меняем местами значения для зацикливания
     mat_swap(&w_k_plus1, M + 1, N + 1, &w_k);
     mat_swap(&z_k_1, M + 1, N + 1, &z_k_0);
     mat_swap(&p_k_2, M + 1, N + 1, &p_k_1);
     mat_swap(&r_k_1, M + 1, N + 1, &r_k_0);
   }
 
-  std::cout << "\nCount iteration: " << i << "\n" << "Result w:\n";
+  std::cout << "\nCount iteration: " << i << std::endl;
   mat_print(w_k, M + 1, N + 1, args);
 
   // очищаем память
