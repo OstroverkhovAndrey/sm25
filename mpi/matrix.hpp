@@ -10,6 +10,8 @@ void mat_copy(double *src, int M, int N, double *target);
 
 void mat_set_value(double *u, int M, int N, int val);
 
+void mat_swap(double **src, int M, int N, double **target);
+
 double *mat_create(int M, int N);
 
 void mat_free(double *mat, int M, int N);

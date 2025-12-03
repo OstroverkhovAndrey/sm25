@@ -10,6 +10,8 @@ double square_of_max(double a, double b) {
   return m * m;
 }
 
+// считаем какая степень двойки x
+// если не степень двойки возвращаем 1
 int from_power_two(int x) {
   int ans = 0;
   while (x % 2 == 0) {
@@ -23,6 +25,7 @@ int from_power_two(int x) {
   return ans;
 }
 
+// возводим число в степень двойки 
 int to_power_two(int x) {
   int ans = 1;
   for (int i = 0; i < x; ++i) {
@@ -95,8 +98,6 @@ Args parse_args(int argc, char *argv[]) {
   args.dims[0] = to_power_two(k_m);
   args.dims[1] = to_power_two(k_n);
 
-  std::cout << "rang: " << args.world_rank  << " dims: " << args.dims[0] << " " << args.dims[1] << std::endl;
-
   int periods[2] = {0, 0};
   int reorder = 1;
   MPI_Cart_create(MPI_COMM_WORLD, 2, args.dims, periods, reorder, &args.comm2d);
@@ -110,6 +111,7 @@ Args parse_args(int argc, char *argv[]) {
   args.M_field = (int)(args.M / to_power_two(k_m));
   args.N_field = (int)(args.N / to_power_two(k_n));
 
+  //  сколько ечеек в предыдущих блоках
   int prev_cell_m = args.M_field * args.coords[0];
   int prev_cell_n = args.N_field * args.coords[1];
 
@@ -125,13 +127,12 @@ Args parse_args(int argc, char *argv[]) {
   } else {
     prev_cell_n += args.N % to_power_two(k_n);
   }
-  // !!!
+
   args.A1_field =
       args.h1 * prev_cell_m + args.A1;
   args.A2_field =
       args.h2 * prev_cell_n + args.A2;
 
-  //std::cout << "coords: " << args.coords[0] << " " << args.coords[1] << " field: " << args.M_field << " " << args.N_field << std::endl;
 
   return args;
 }

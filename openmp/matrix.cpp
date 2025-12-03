@@ -97,7 +97,7 @@ void mat_mul_number(double *mat, double val, int M, int N) {
   return;
 }
 
-// вывд матрицы в точностью 5 знаков после запятой
+// вывод матрицы в точностью 5 знаков после запятой
 void mat_print(double *mat, int M, int N, Args args) {
   std::string legend =
       "M_" + std::to_string(args.M) + "__N_" + std::to_string(args.N);

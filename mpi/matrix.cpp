@@ -16,11 +16,10 @@
 double scalar_product(double *u, double *v, double h1, double h2, int M, int N,
                       Args args) {
   double ans = 0.0;
-  int i, j;
-  for (int k = 0; k < (M - 2) * (N - 2); ++k) {
-    i = k % (M - 2) + 1;
-    j = k / (M - 2) + 1;
-    ans += h1 * h2 * u[j * M + i] * v[j * M + i];
+  for (int j = 1; j < N - 1; ++j) {
+    for (int i = 1; i < M - 1; ++i) {
+      ans += h1 * h2 * u[j * M + i] * v[j * M + i];
+    }
   }
 
   double global_ans = 0.0;
@@ -35,21 +34,26 @@ double norm(double *u, double h1, double h2, int M, int N, Args args) {
 
 // копирование матрицы
 void mat_copy(double *src, int M, int N, double *target) {
-  int i, j;
-  for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
-    target[j * M + i] = src[j * M + i];
+  for (int j = 0; j < N; ++j) {
+    for (int i = 0; i < M; ++i) {
+      target[j * M + i] = src[j * M + i];
+    }
   }
+}
+
+// обмен матриц указателями
+void mat_swap(double **src, int M, int N, double **target) {
+  double *tmp = *src;
+  *src = *target;
+  *target = tmp;
 }
 
 // установка во все значения матрицы значения val
 void mat_set_value(double *u, int M, int N, int val) {
-  int i, j;
-  for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
-    u[j * M + i] = val;
+  for (int j = 0; j < N; ++j) {
+    for (int i = 0; i < M; ++i) {
+      u[j * M + i] = val;
+    }
   }
 }
 
@@ -65,38 +69,35 @@ void mat_free(double *mat, int M, int N) { free(mat); }
 
 // сложени матицы u и матрицы v поэлементно
 void mat_plus(double *u, double *v, int M, int N, double *ans) {
-  int i, j;
-  for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
-    ans[j * M + i] = u[j * M + i] + v[j * M + i];
+  for (int j = 0; j < N; ++j) {
+    for (int i = 0; i < M; ++i) {
+      ans[j * M + i] = u[j * M + i] + v[j * M + i];
+    }
   }
   return;
 }
 
 // вычитание из матицы u матрицы v поэлементно
 void mat_minus(double *u, double *v, int M, int N, double *ans) {
-  int i, j;
-  for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
-    ans[j * M + i] = u[j * M + i] - v[j * M + i];
+  for (int j = 0; j < N; ++j) {
+    for (int i = 0; i < M; ++i) {
+      ans[j * M + i] = u[j * M + i] - v[j * M + i];
+    }
   }
   return;
 }
 
 // умножение всех элементов матрицы на число val
 void mat_mul_number(double *mat, double val, int M, int N) {
-  int i, j;
-  for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
-    mat[j * M + i] *= val;
+  for (int j = 0; j < N; ++j) {
+    for (int i = 0; i < M; ++i) {
+      mat[j * M + i] *= val;
+    }
   }
   return;
 }
 
-// вывд матрицы в точностью 5 знаков после запятой
+// вывод матрицы в точностью 5 знаков после запятой
 void mat_print(double *mat, int M, int N, Args args) {
   std::ostringstream oss;
   oss << "coords=(" << args.coords[0] << "," << args.coords[1] << ")\n";

@@ -14,10 +14,8 @@
 // оператор A
 void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
-  int i, j;
-  for (int k = 0; k < (N - 0) * (M - 0); ++k) {
-    i = (k % (M - 0)) + 1;
-    j = (k / (M - 0)) + 1;
+  for (int j = 1; j < N+1; ++j) {
+    for (int i = 1; i < M+1; ++i) {
     double s1 = ((a[j * (M + 2) + (i + 1)] *
                   (w[j * (M + 2) + (i + 1)] - w[j * (M + 2) + i]) / h1) -
                  (a[j * (M + 2) + i] *
@@ -29,17 +27,7 @@ void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
                   (w[j * (M + 2) + i] - w[(j - 1) * (M + 2) + i]) / h2)) /
                 h2;
     ans[j * (M + 2) + i] = -s1 - s2;
-  }
-  return;
-}
-
-// оператор B
-void B_fun(double *F, int M, int N, double *ans) {
-  int i, j;
-  for (int k = 0; k < (N - 0) * (M - 0); ++k) {
-    i = (k % (M - 0)) + 1;
-    j = (k / (M - 0)) + 1;
-    ans[j * (M + 2) + i] = F[j * (M + 2) + i];
+    }
   }
   return;
 }
@@ -47,13 +35,12 @@ void B_fun(double *F, int M, int N, double *ans) {
 // оператор D
 void D_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
-  int i, j;
-  for (int k = 0; k < (N - 0) * (M - 0); ++k) {
-    i = (k % (M - 0)) + 1;
-    j = (k / (M - 0)) + 1;
+  for (int j = 1; j < N+1; ++j) {
+    for (int i = 1; i < M+1; ++i) {
     double d = ((a[j * (M + 2) + (i + 1)] + a[j * (M + 2) + i]) / (h1 * h1)) +
                ((b[(j + 1) * (M + 2) + i] + b[j * (M + 2) + i]) / (h2 * h2));
     ans[j * (M + 2) + i] = w[j * (M + 2) + i] / d;
+    }
   }
   return;
 }
@@ -82,10 +69,10 @@ double calc_F_ij(double h1, double h2, Point p) {
 // инициализируем и заполняем матрицу a
 double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
   double *a = mat_create(M + 2, N + 2);
-  int i, j;
-  for (int k = 0; k < (N + 2) * (M + 2); ++k) {
-    i = (k % (M + 2));
-    j = (k / (M + 2));
+  // тут считаем от нуля, чтобы корректно считалось в mpi версии
+  // на последовательный и OpenMP код это не влияет
+  for (int j = 0; j < N + 2; ++j) {
+    for (int i = 0; i < M + 2; ++i) {
     Point p1;
     p1.x = i * h1 - 0.5 * h1 + args.A1_field,
     p1.y = j * h2 - 0.5 * h2 + args.A2_field;
@@ -93,6 +80,7 @@ double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
     p2.x = i * h1 - 0.5 * h1 + args.A1_field,
     p2.y = j * h2 + 0.5 * h2 + args.A2_field;
     a[j * (M + 2) + i] = calc_a_ij(h2, p1, p2, eps);
+    }
   }
   return a;
 }
@@ -100,10 +88,10 @@ double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
 // инициализируем и заполняем матрицу b
 double *init_b(int M, int N, double h1, double h2, double eps, Args args) {
   double *b = mat_create(M + 2, N + 2);
-  int i, j;
-  for (int k = 0; k < (N + 2) * (M + 2); ++k) {
-    i = (k % (M + 2));
-    j = (k / (M + 2));
+  // тут считаем от нуля, чтобы корректно считалось в mpi версии
+  // на последовательный и OpenMP код это не влияет
+  for (int j = 0; j < N + 2; ++j) {
+    for (int i = 0; i < M + 2; ++i) {
     Point p1;
     p1.x = i * h1 - 0.5 * h1 + args.A1_field,
     p1.y = j * h2 - 0.5 * h2 + args.A2_field;
@@ -111,6 +99,7 @@ double *init_b(int M, int N, double h1, double h2, double eps, Args args) {
     p2.x = i * h1 + 0.5 * h1 + args.A1_field,
     p2.y = j * h2 - 0.5 * h2 + args.A2_field;
     b[j * (M + 2) + i] = calc_b_ij(h1, p1, p2, eps);
+    }
   }
   return b;
 }
@@ -118,13 +107,12 @@ double *init_b(int M, int N, double h1, double h2, double eps, Args args) {
 // инициализируем и заполняем матрицу F
 double *init_F(int M, int N, double h1, double h2, double eps, Args args) {
   double *F = mat_create(M + 2, N + 2);
-  int i, j;
-  for (int k = 0; k < (N + 2) * (M + 2); ++k) {
-    i = (k % (M + 2));
-    j = (k / (M + 2));
+  for (int j = 1; j < N + 1; ++j) {
+    for (int i = 1; i < M + 1; ++i) {
     Point p;
     p.x = i * h1 + args.A1_field, p.y = j * h2 + args.A2_field;
     F[j * (M + 2) + i] = calc_F_ij(h1, h2, p);
+    }
   }
   return F;
 }
@@ -248,6 +236,7 @@ int main(int argc, char *argv[]) {
   {
     // std::cout << "Zero iteration\n\n";
     // r_k_0 = B - A w_k
+    send_border(w_k, args);
     A_fun(a, b, w_k, args.M_field, args.N_field, h1, h2, temp1);
     mat_minus(F, temp1, args.M_field + 2, args.N_field + 2, r_k_0);
 
@@ -271,7 +260,7 @@ int main(int argc, char *argv[]) {
     mat_plus(w_k, temp1, args.M_field + 2, args.N_field + 2, w_k_plus1);
 
     // w_0 = w_1, для зацикливания
-    mat_copy(w_k_plus1, args.M_field + 2, args.N_field + 2, w_k);
+    mat_swap(&w_k_plus1, args.M_field + 2, args.N_field + 2, &w_k);
   }
 
   // std::cout << "Start iteration\n\n";
@@ -311,17 +300,16 @@ int main(int argc, char *argv[]) {
     // считаем ошибку
     mat_minus(w_k_plus1, w_k, M + 2, N + 2, temp1);
     err = norm(temp1, h1, h2, M + 2, N + 2, args);
-
     if (args.rank2d == 0) {
       std::cout << std::fixed << std::setprecision(args.precision)
                 << "error: " << err << std::endl;
     }
 
     // копируем значения для зацикливания
-    mat_copy(w_k_plus1, M + 2, N + 2, w_k);
-    mat_copy(z_k_1, M + 2, N + 2, z_k_0);
-    mat_copy(p_k_2, M + 2, N + 2, p_k_1);
-    mat_copy(r_k_1, M + 2, N + 2, r_k_0);
+    mat_swap(&w_k_plus1, M + 2, N + 2, &w_k);
+    mat_swap(&z_k_1, M + 2, N + 2, &z_k_0);
+    mat_swap(&p_k_2, M + 2, N + 2, &p_k_1);
+    mat_swap(&r_k_1, M + 2, N + 2, &r_k_0);
   }
 
   if (args.rank2d == 0) {
