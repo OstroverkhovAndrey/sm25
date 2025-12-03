@@ -91,9 +91,11 @@ Args parse_args(int argc, char *argv[]) {
     }
     k--;
   }
-  // отсчет идет от 1
-  args.dims[0] = k_m + 1;
-  args.dims[1] = k_n + 1;
+
+  args.dims[0] = to_power_two(k_m);
+  args.dims[1] = to_power_two(k_n);
+
+  std::cout << "rang: " << args.world_rank  << " dims: " << args.dims[0] << " " << args.dims[1] << std::endl;
 
   int periods[2] = {0, 0};
   int reorder = 1;
@@ -129,7 +131,7 @@ Args parse_args(int argc, char *argv[]) {
   args.A2_field =
       args.h2 * prev_cell_n + args.A2;
 
-  std::cout << "coords: " << args.coords[0] << " " << args.coords[1] << " field: " << args.M_field << " " << args.N_field << std::endl;
+  //std::cout << "coords: " << args.coords[0] << " " << args.coords[1] << " field: " << args.M_field << " " << args.N_field << std::endl;
 
   return args;
 }
