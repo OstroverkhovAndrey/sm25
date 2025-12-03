@@ -1,6 +1,7 @@
 
 all:
 	mkdir -p build
+	mkdir -p txt
 	g++ -c prog.cpp -o  build/prog.o -I. -std=c++11 -O2 -fopenmp
 	g++ -c variant.cpp -o build/variant.o -I. -std=c++11 -O2 -fopenmp
 	g++ -c matrix.cpp -o build/matrix.o -I. -std=c++11 -O2 -fopenmp

@@ -7,6 +7,8 @@ double norm(double *u, double h1, double h2, int M, int N);
 
 void mat_copy(double *src, int M, int N, double *target);
 
+void mat_swap(double **src, int M, int N, double **target);
+
 void mat_set_value(double *u, int M, int N, int val);
 
 double *mat_create(int M, int N);

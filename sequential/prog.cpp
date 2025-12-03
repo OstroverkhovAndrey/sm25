@@ -16,17 +16,17 @@ void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
   for (int j = 1; j < N; ++j) {
     for (int i = 1; i < M; ++i) {
 
-    double s1 = ((a[j * (M + 1) + (i + 1)] *
-                  (w[j * (M + 1) + (i + 1)] - w[j * (M + 1) + i]) / h1) -
-                 (a[j * (M + 1) + i] *
-                  (w[j * (M + 1) + i] - w[j * (M + 1) + (i - 1)]) / h1)) /
-                h1;
-    double s2 = ((b[(j + 1) * (M + 1) + i] *
-                  (w[(j + 1) * (M + 1) + i] - w[j * (M + 1) + i]) / h2) -
-                 (b[j * (M + 1) + i] *
-                  (w[j * (M + 1) + i] - w[(j - 1) * (M + 1) + i]) / h2)) /
-                h2;
-    ans[j * (M + 1) + i] = -s1 - s2;
+      double s1 = ((a[j * (M + 1) + (i + 1)] *
+                    (w[j * (M + 1) + (i + 1)] - w[j * (M + 1) + i]) / h1) -
+                   (a[j * (M + 1) + i] *
+                    (w[j * (M + 1) + i] - w[j * (M + 1) + (i - 1)]) / h1)) /
+                  h1;
+      double s2 = ((b[(j + 1) * (M + 1) + i] *
+                    (w[(j + 1) * (M + 1) + i] - w[j * (M + 1) + i]) / h2) -
+                   (b[j * (M + 1) + i] *
+                    (w[j * (M + 1) + i] - w[(j - 1) * (M + 1) + i]) / h2)) /
+                  h2;
+      ans[j * (M + 1) + i] = -s1 - s2;
     }
   }
   return;
@@ -37,9 +37,9 @@ void D_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
   for (int j = 1; j < N; ++j) {
     for (int i = 1; i < M; ++i) {
-    double d = ((a[j * (M + 1) + (i + 1)] + a[j * (M + 1) + i]) / (h1 * h1)) +
-               ((b[(j + 1) * (M + 1) + i] + b[j * (M + 1) + i]) / (h2 * h2));
-    ans[j * (M + 1) + i] = w[j * (M + 1) + i] / d;
+      double d = ((a[j * (M + 1) + (i + 1)] + a[j * (M + 1) + i]) / (h1 * h1)) +
+                 ((b[(j + 1) * (M + 1) + i] + b[j * (M + 1) + i]) / (h2 * h2));
+      ans[j * (M + 1) + i] = w[j * (M + 1) + i] / d;
     }
   }
   return;
@@ -68,16 +68,16 @@ double calc_F_ij(double h1, double h2, Point p) {
 
 // инициализируем и заполняем матрицу a
 double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
-  double *a = mat_create(M+1, N+1);
+  double *a = mat_create(M + 1, N + 1);
   // тут считаем от нуля, чтобы корректно считалось в mpi версии
   // на последовательный и OpenMP код это не влияет
-  for (int j = 0; j < N+1; ++j) {
-    for (int i = 0; i < M+1; ++i) {
-    Point p1;
-    p1.x = i * h1 - 0.5 * h1 + args.A1, p1.y = j * h2 - 0.5 * h2 + args.A2;
-    Point p2;
-    p2.x = i * h1 - 0.5 * h1 + args.A1, p2.y = j * h2 + 0.5 * h2 + args.A2;
-    a[j * (M+1) + i] = calc_a_ij(h2, p1, p2, eps);
+  for (int j = 0; j < N + 1; ++j) {
+    for (int i = 0; i < M + 1; ++i) {
+      Point p1;
+      p1.x = i * h1 - 0.5 * h1 + args.A1, p1.y = j * h2 - 0.5 * h2 + args.A2;
+      Point p2;
+      p2.x = i * h1 - 0.5 * h1 + args.A1, p2.y = j * h2 + 0.5 * h2 + args.A2;
+      a[j * (M + 1) + i] = calc_a_ij(h2, p1, p2, eps);
     }
   }
   return a;
@@ -88,13 +88,13 @@ double *init_b(int M, int N, double h1, double h2, double eps, Args args) {
   double *b = mat_create(M + 1, N + 1);
   // тут считаем от нуля, чтобы корректно считалось в mpi версии
   // на последовательный и OpenMP код это не влияет
-  for (int j = 0; j < N+1; ++j) {
-    for (int i = 0; i < M+1; ++i) {
-    Point p1;
-    p1.x = i * h1 - 0.5 * h1 + args.A1, p1.y = j * h2 - 0.5 * h2 + args.A2;
-    Point p2;
-    p2.x = i * h1 + 0.5 * h1 + args.A1, p2.y = j * h2 - 0.5 * h2 + args.A2;
-    b[j * (M + 1) + i] = calc_b_ij(h1, p1, p2, eps);
+  for (int j = 0; j < N + 1; ++j) {
+    for (int i = 0; i < M + 1; ++i) {
+      Point p1;
+      p1.x = i * h1 - 0.5 * h1 + args.A1, p1.y = j * h2 - 0.5 * h2 + args.A2;
+      Point p2;
+      p2.x = i * h1 + 0.5 * h1 + args.A1, p2.y = j * h2 - 0.5 * h2 + args.A2;
+      b[j * (M + 1) + i] = calc_b_ij(h1, p1, p2, eps);
     }
   }
   return b;
@@ -105,9 +105,9 @@ double *init_F(int M, int N, double h1, double h2, double eps, Args args) {
   double *F = mat_create(M + 1, N + 1);
   for (int j = 1; j < N; ++j) {
     for (int i = 1; i < M; ++i) {
-    Point p;
-    p.x = i * h1 + args.A1, p.y = j * h2 + args.A2;
-    F[j * (M + 1) + i] = calc_F_ij(h1, h2, p);
+      Point p;
+      p.x = i * h1 + args.A1, p.y = j * h2 + args.A2;
+      F[j * (M + 1) + i] = calc_F_ij(h1, h2, p);
     }
   }
   return F;
@@ -233,7 +233,9 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "\nCount iteration: " << i << std::endl;
-  mat_print(w_k, M + 1, N + 1, args);
+  if (args.print_result) {
+    mat_print(w_k, M + 1, N + 1, args);
+  }
 
   // очищаем память
   mat_free(a, M + 1, N + 1);
@@ -253,7 +255,7 @@ int main(int argc, char *argv[]) {
   mat_free(r_k_1, M + 1, N + 1);
 
   end_time = omp_get_wtime();
-  std::cout << std::fixed << std::setprecision(args.precision)
-            << "Work took " << end_time - start_time << " seconds\n";
+  std::cout << std::fixed << std::setprecision(args.precision) << "Work took "
+            << end_time - start_time << " seconds\n";
   return 0;
 }

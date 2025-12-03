@@ -22,6 +22,10 @@ Args parse_args(int argc, char *argv[]) {
       ++i;
       continue;
     }
+    if (std::string(argv[i]) == "print_result") {
+      args.print_result = true;
+      continue;
+    }
     if (std::string(argv[i]) == "count_iter") {
       args.count_iter = std::stoi(argv[i + 1]);
       ++i;
