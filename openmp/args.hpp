@@ -14,6 +14,7 @@ struct Args {
   double h2{0.0};
   double eps{0.0};
   int precision{5};
+  bool print_result{false};
 };
 
 Args parse_args(int argc, char *argv[]);
