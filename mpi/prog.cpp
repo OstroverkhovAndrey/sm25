@@ -315,7 +315,9 @@ int main(int argc, char *argv[]) {
   if (args.rank2d == 0) {
     std::cout << "\nCount iteration: " << i << "\n";
   }
-  //mat_print(w_k, args.M_field + 2, args.N_field + 2, args);
+  if (args.print_result) {
+    mat_print(w_k, M + 2, N + 2, args);
+  }
 
   // очищаем память
   mat_free(a, args.M_field + 2, args.N_field + 2);

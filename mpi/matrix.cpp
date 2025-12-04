@@ -99,14 +99,16 @@ void mat_mul_number(double *mat, double val, int M, int N) {
 
 // вывод матрицы в точностью 5 знаков после запятой
 void mat_print(double *mat, int M, int N, Args args) {
+  // прибавляем 1, потому что в args.cpp делали -1
+  std::string legend =
+      "M_" + std::to_string(args.M+1) + "__N_" + std::to_string(args.N+1) + "__MPI_" + std::to_string(args.world_size);
   std::ostringstream oss;
+  oss << legend << std::endl;
   oss << "coords=(" << args.coords[0] << "," << args.coords[1] << ")\n";
 
-  int i, j;
   oss << "[";
-  for (int k = 0; k < M * N; ++k) {
-    i = k % M;
-    j = k / M;
+  for (int j = 0; j < N; ++j) {
+    for (int i = 0; i < M; ++i) {
     if (i == 0) {
       oss << "[";
     }
@@ -116,9 +118,10 @@ void mat_print(double *mat, int M, int N, Args args) {
       oss << "],\n";
     }
   }
+}
   oss << "]\n\n";
 
-  std::string filename = "./txt/" + std::to_string(args.world_size) + "_" +
+  std::string filename = "./txt/" + legend + "_" +
                          std::to_string(args.rank2d) + ".txt";
   std::ofstream file(filename);
   if (!file.is_open()) {

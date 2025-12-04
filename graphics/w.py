@@ -79,6 +79,7 @@ def parse_file(filename):
 def main():
     parser = argparse.ArgumentParser(description="Визуализация работы последовательной и OpenMP программы")
     parser.add_argument('filename', type=str, help='Путь до файл с матрицей значений')
+    parser.add_argument('mpi', type=bool, nargs='?', default=False, help=' Если флаг установлен, матрица значение получена с помощью MPI и ее надо собрать по кусочкам')
     parser.add_argument('mod', type=str, nargs='?', default='2d', help='Тип визулизации: "2d" или "3d"')
     parser.add_argument('cmap', type=str, nargs='?', default='inferno', help='Цвет "inferno" или "viridis"')
     args = parser.parse_args()

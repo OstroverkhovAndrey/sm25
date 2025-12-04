@@ -16,6 +16,7 @@ struct Args {
   double h2{0.0};
   double eps{0.0};
   int precision{5};
+  bool print_result{false};
 
   int N_field{-1};
   int M_field{-1};
