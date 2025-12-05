@@ -14,19 +14,19 @@
 // оператор A
 void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
-  for (int j = 1; j < N+1; ++j) {
-    for (int i = 1; i < M+1; ++i) {
-    double s1 = ((a[j * (M + 2) + (i + 1)] *
-                  (w[j * (M + 2) + (i + 1)] - w[j * (M + 2) + i]) / h1) -
-                 (a[j * (M + 2) + i] *
-                  (w[j * (M + 2) + i] - w[j * (M + 2) + (i - 1)]) / h1)) /
-                h1;
-    double s2 = ((b[(j + 1) * (M + 2) + i] *
-                  (w[(j + 1) * (M + 2) + i] - w[j * (M + 2) + i]) / h2) -
-                 (b[j * (M + 2) + i] *
-                  (w[j * (M + 2) + i] - w[(j - 1) * (M + 2) + i]) / h2)) /
-                h2;
-    ans[j * (M + 2) + i] = -s1 - s2;
+  for (int j = 1; j < N + 1; ++j) {
+    for (int i = 1; i < M + 1; ++i) {
+      double s1 = ((a[j * (M + 2) + (i + 1)] *
+                    (w[j * (M + 2) + (i + 1)] - w[j * (M + 2) + i]) / h1) -
+                   (a[j * (M + 2) + i] *
+                    (w[j * (M + 2) + i] - w[j * (M + 2) + (i - 1)]) / h1)) /
+                  h1;
+      double s2 = ((b[(j + 1) * (M + 2) + i] *
+                    (w[(j + 1) * (M + 2) + i] - w[j * (M + 2) + i]) / h2) -
+                   (b[j * (M + 2) + i] *
+                    (w[j * (M + 2) + i] - w[(j - 1) * (M + 2) + i]) / h2)) /
+                  h2;
+      ans[j * (M + 2) + i] = -s1 - s2;
     }
   }
   return;
@@ -35,11 +35,11 @@ void A_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
 // оператор D
 void D_fun(double *a, double *b, double *w, int M, int N, double h1, double h2,
            double *ans) {
-  for (int j = 1; j < N+1; ++j) {
-    for (int i = 1; i < M+1; ++i) {
-    double d = ((a[j * (M + 2) + (i + 1)] + a[j * (M + 2) + i]) / (h1 * h1)) +
-               ((b[(j + 1) * (M + 2) + i] + b[j * (M + 2) + i]) / (h2 * h2));
-    ans[j * (M + 2) + i] = w[j * (M + 2) + i] / d;
+  for (int j = 1; j < N + 1; ++j) {
+    for (int i = 1; i < M + 1; ++i) {
+      double d = ((a[j * (M + 2) + (i + 1)] + a[j * (M + 2) + i]) / (h1 * h1)) +
+                 ((b[(j + 1) * (M + 2) + i] + b[j * (M + 2) + i]) / (h2 * h2));
+      ans[j * (M + 2) + i] = w[j * (M + 2) + i] / d;
     }
   }
   return;
@@ -73,13 +73,13 @@ double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
   // на последовательный и OpenMP код это не влияет
   for (int j = 0; j < N + 2; ++j) {
     for (int i = 0; i < M + 2; ++i) {
-    Point p1;
-    p1.x = i * h1 - 0.5 * h1 + args.A1_field,
-    p1.y = j * h2 - 0.5 * h2 + args.A2_field;
-    Point p2;
-    p2.x = i * h1 - 0.5 * h1 + args.A1_field,
-    p2.y = j * h2 + 0.5 * h2 + args.A2_field;
-    a[j * (M + 2) + i] = calc_a_ij(h2, p1, p2, eps);
+      Point p1;
+      p1.x = i * h1 - 0.5 * h1 + args.A1_field,
+      p1.y = j * h2 - 0.5 * h2 + args.A2_field;
+      Point p2;
+      p2.x = i * h1 - 0.5 * h1 + args.A1_field,
+      p2.y = j * h2 + 0.5 * h2 + args.A2_field;
+      a[j * (M + 2) + i] = calc_a_ij(h2, p1, p2, eps);
     }
   }
   return a;
@@ -92,13 +92,13 @@ double *init_b(int M, int N, double h1, double h2, double eps, Args args) {
   // на последовательный и OpenMP код это не влияет
   for (int j = 0; j < N + 2; ++j) {
     for (int i = 0; i < M + 2; ++i) {
-    Point p1;
-    p1.x = i * h1 - 0.5 * h1 + args.A1_field,
-    p1.y = j * h2 - 0.5 * h2 + args.A2_field;
-    Point p2;
-    p2.x = i * h1 + 0.5 * h1 + args.A1_field,
-    p2.y = j * h2 - 0.5 * h2 + args.A2_field;
-    b[j * (M + 2) + i] = calc_b_ij(h1, p1, p2, eps);
+      Point p1;
+      p1.x = i * h1 - 0.5 * h1 + args.A1_field,
+      p1.y = j * h2 - 0.5 * h2 + args.A2_field;
+      Point p2;
+      p2.x = i * h1 + 0.5 * h1 + args.A1_field,
+      p2.y = j * h2 - 0.5 * h2 + args.A2_field;
+      b[j * (M + 2) + i] = calc_b_ij(h1, p1, p2, eps);
     }
   }
   return b;
@@ -109,9 +109,9 @@ double *init_F(int M, int N, double h1, double h2, double eps, Args args) {
   double *F = mat_create(M + 2, N + 2);
   for (int j = 1; j < N + 1; ++j) {
     for (int i = 1; i < M + 1; ++i) {
-    Point p;
-    p.x = i * h1 + args.A1_field, p.y = j * h2 + args.A2_field;
-    F[j * (M + 2) + i] = calc_F_ij(h1, h2, p);
+      Point p;
+      p.x = i * h1 + args.A1_field, p.y = j * h2 + args.A2_field;
+      F[j * (M + 2) + i] = calc_F_ij(h1, h2, p);
     }
   }
   return F;
@@ -234,7 +234,9 @@ int main(int argc, char *argv[]) {
   double *r_k_1 = mat_create(args.M_field + 2, args.N_field + 2);
 
   {
-    // std::cout << "Zero iteration\n\n";
+    if (args.rank2d == 0) {
+      std::cout << "Zero iteration\n\n";
+    }
     // r_k_0 = B - A w_k
     send_border(w_k, args);
     A_fun(a, b, w_k, args.M_field, args.N_field, h1, h2, temp1);
@@ -263,7 +265,9 @@ int main(int argc, char *argv[]) {
     mat_swap(&w_k_plus1, args.M_field + 2, args.N_field + 2, &w_k);
   }
 
-  // std::cout << "Start iteration\n\n";
+  if (args.rank2d == 0) {
+    std::cout << "Start iteration\n\n";
+  }
   int i = 0;
   double err = args.delta + 1;
   for (; stop_iter(i, err, args); ++i) {

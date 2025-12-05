@@ -25,7 +25,7 @@ int from_power_two(int x) {
   return ans;
 }
 
-// возводим число в степень двойки 
+// возводим число в степень двойки
 int to_power_two(int x) {
   int ans = 1;
   for (int i = 0; i < x; ++i) {
@@ -132,13 +132,19 @@ Args parse_args(int argc, char *argv[]) {
     prev_cell_n += args.N % to_power_two(k_n);
   }
 
-  args.A1_field =
-      args.h1 * prev_cell_m + args.A1;
-  args.A2_field =
-      args.h2 * prev_cell_n + args.A2;
+  args.A1_field = args.h1 * prev_cell_m + args.A1;
+  args.A2_field = args.h2 * prev_cell_n + args.A2;
 
   args.N += 1;
   args.M += 1;
+
+  if (args.rank2d == 0) {
+    std::cout << std::fixed << std::setprecision(args.precision)
+              << "args: N == " << args.N << " M == " << args.M
+              << " count_iter == " << args.count_iter
+              << " delta == " << args.delta << " test == " << args.with_test
+              << std::endl;
+  }
 
   return args;
 }

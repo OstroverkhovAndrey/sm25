@@ -99,8 +99,9 @@ void mat_mul_number(double *mat, double val, int M, int N) {
 
 // вывод матрицы в точностью 5 знаков после запятой
 void mat_print(double *mat, int M, int N, Args args) {
-  std::string legend =
-      "M_" + std::to_string(args.M) + "__N_" + std::to_string(args.N) + "__MPI_" + std::to_string(args.world_size);
+  std::string legend = "M_" + std::to_string(args.M) + "__N_" +
+                       std::to_string(args.N) + "__MPI_" +
+                       std::to_string(args.world_size);
   std::ostringstream oss;
   oss << legend << std::endl;
   oss << "coords=(" << args.coords[0] << "," << args.coords[1] << ")\n";
@@ -108,20 +109,20 @@ void mat_print(double *mat, int M, int N, Args args) {
   oss << "[";
   for (int j = 0; j < N; ++j) {
     for (int i = 0; i < M; ++i) {
-    if (i == 0) {
-      oss << "[";
-    }
-    oss << std::fixed << std::setprecision(args.precision) << mat[j * M + i]
-        << ", ";
-    if (i == M - 1) {
-      oss << "],\n";
+      if (i == 0) {
+        oss << "[";
+      }
+      oss << std::fixed << std::setprecision(args.precision) << mat[j * M + i]
+          << ", ";
+      if (i == M - 1) {
+        oss << "],\n";
+      }
     }
   }
-}
   oss << "]\n\n";
 
-  std::string filename = "./txt/" + legend + "_" +
-                         std::to_string(args.rank2d) + ".txt";
+  std::string filename =
+      "./txt/" + legend + "_" + std::to_string(args.rank2d) + ".txt";
   std::ofstream file(filename);
   if (!file.is_open()) {
     std::cerr << "Ошибка: не удалось открыть файл " << filename << std::endl;

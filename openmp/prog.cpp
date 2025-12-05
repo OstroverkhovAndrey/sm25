@@ -71,8 +71,8 @@ double calc_F_ij(double h1, double h2, Point p) {
 // инициализируем и заполняем матрицу a
 double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
   double *a = mat_create(M + 1, N + 1);
-  // тут считаем от нуля, чтобы корректно считалось в mpi версии
-  // на последовательный и OpenMP код это не влияет
+// тут считаем от нуля, чтобы корректно считалось в mpi версии
+// на последовательный и OpenMP код это не влияет
   #pragma omp parallel for collapse(2) schedule(static)
   for (int j = 0; j < N + 1; ++j) {
     for (int i = 0; i < M + 1; ++i) {
@@ -89,8 +89,8 @@ double *init_a(int M, int N, double h1, double h2, double eps, Args args) {
 // инициализируем и заполняем матрицу b
 double *init_b(int M, int N, double h1, double h2, double eps, Args args) {
   double *b = mat_create(M + 1, N + 1);
-  // тут считаем от нуля, чтобы корректно считалось в mpi версии
-  // на последовательный и OpenMP код это не влияет
+// тут считаем от нуля, чтобы корректно считалось в mpi версии
+// на последовательный и OpenMP код это не влияет
   #pragma omp parallel for collapse(2) schedule(static)
   for (int j = 0; j < N + 1; ++j) {
     for (int i = 0; i < M + 1; ++i) {
