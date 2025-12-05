@@ -99,9 +99,8 @@ void mat_mul_number(double *mat, double val, int M, int N) {
 
 // вывод матрицы в точностью 5 знаков после запятой
 void mat_print(double *mat, int M, int N, Args args) {
-  // прибавляем 1, потому что в args.cpp делали -1
   std::string legend =
-      "M_" + std::to_string(args.M+1) + "__N_" + std::to_string(args.N+1) + "__MPI_" + std::to_string(args.world_size);
+      "M_" + std::to_string(args.M) + "__N_" + std::to_string(args.N) + "__MPI_" + std::to_string(args.world_size);
   std::ostringstream oss;
   oss << legend << std::endl;
   oss << "coords=(" << args.coords[0] << "," << args.coords[1] << ")\n";

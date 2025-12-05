@@ -137,6 +137,8 @@ Args parse_args(int argc, char *argv[]) {
   args.A2_field =
       args.h2 * prev_cell_n + args.A2;
 
+  args.N += 1;
+  args.M += 1;
 
   return args;
 }
