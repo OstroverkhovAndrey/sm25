@@ -73,6 +73,7 @@ def parse_file_sequential(filename):
     i = 1
     matrix = " ".join(lines[1:])
     matrix = ast.literal_eval(matrix)
+    matrix = [ row[1:-1] for row in matrix[1:-1] ]
     return legend, matrix
 
 
