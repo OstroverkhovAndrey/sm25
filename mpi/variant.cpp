@@ -349,5 +349,5 @@ void test_calc_S_ij() {
       std::cout << "Faild test " << i << " for calc_S_ij\n";
     }
   }
-  printf("\n");
+  std::cout << std::endl;
 }
