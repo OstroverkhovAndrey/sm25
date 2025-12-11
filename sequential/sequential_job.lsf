@@ -1,0 +1,5 @@
+#BSUB -n 1
+#BSUB -W 00:15
+#BSUB -o "result.%J.out"
+#BSUB -e "result.%J.err"
+./sm25/sequential/build/prog N 600 M 400 delta 0.00001
