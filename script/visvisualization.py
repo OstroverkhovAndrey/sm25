@@ -53,7 +53,7 @@ def visvisualization_3d(legend, matrix, cmap):
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
     ax.set_title(legend)
-    fig.colorbar(surface, ax=ax, shrink=0.5, aspect=5, pad=0.15)
+    fig.colorbar(surface, ax=ax, shrink=0.5, aspect=5, pad=0.15, label='значение')
     plt.show()
 
 
