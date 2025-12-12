@@ -1,0 +1,6 @@
+#BSUB -n 5
+#BSUB -W 00:15
+#BSUB -o "result.%J.out"
+#BSUB -e "result.%J.err"
+#BSUB -R "span[hosts=1]"
+OMP_NUM_THREADS=32 ./build/prog N 1200 M 800 delta 0.00001

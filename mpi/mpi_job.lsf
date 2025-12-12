@@ -1,0 +1,5 @@
+#BSUB -n 32
+#BSUB -W 00:15
+#BSUB -o "result.%J.out"
+#BSUB -e "result.%J.err"
+mpiexec --bind-to core ./build/prog N 1200 M 800 delta 0.00001

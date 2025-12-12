@@ -1,0 +1,6 @@
+#BSUB -n 4
+#BSUB -W 00:15
+#BSUB -o "result.%J.out"
+#BSUB -e "result.%J.err"
+#BSUB -R "affinity[core(8)]"
+OMP_NUM_THREADS=8 mpiexec --bind-to core ./build/prog N 1200 M 800 delta 0.00001
