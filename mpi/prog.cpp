@@ -149,7 +149,7 @@ void send_border(double *v, Args args) {
     }
   }
   {
-    // справа на лево
+    // справа налево
     double *send_v = (double *)malloc((size_t)n * sizeof(double));
     for (int i = 0; i < n; ++i) {
       send_v[i] = v[(i + 1) * (m + 2) + 1];
